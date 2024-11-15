@@ -1,0 +1,10 @@
+streamlit
+numpy==2.0
+pandas
+scikit-learn
+imblearn
+seaborn
+requests
+xgboost
+streamlit_folium
+plotly==5.24.1
