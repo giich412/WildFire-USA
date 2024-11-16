@@ -467,7 +467,7 @@ if page == pages[2] :
             family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=50, b=290),titlefont=dict(size=18))   
       return fig7
     fig7=scatter_geo_global()
-   fig7
+    fig7
     #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
 
   #with col2:
