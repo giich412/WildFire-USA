@@ -443,33 +443,33 @@ if page == pages[3] :
     
     #st.plotly_chart(fig6)
   #if st.checkbox("Afficher graphiques répartition géographique et année") :
-  col1, col2 = st.columns(2)
+#  col1, col2 = st.columns(2)
 
-  with col1:
-    @st.cache_data(persist=True)
-    def scatter_geo_global():
-      fig7 = px.scatter_geo(FiresClasse,
-          lon = FiresClasse['LONGITUDE'],
-          lat = FiresClasse['LATITUDE'],
-          color="STAT_CAUSE_DESCR",
-    #    #facet_col="FIRE_YEAR", #pour créer un graph par année
-     #   #facet_col_wrap,# pour définir le nombre de graph par ligne
-        #animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
-          color_discrete_sequence=["blue","orange","red","grey","purple"],
-          labels={"STAT_CAUSE_DESCR": "Cause"},
-          hover_name="STATE", # column added to hover information
-          size=FiresClasse['FIRE_SIZE']/1000, # size of markers
-          projection='albers usa',
-          width=800,
-          height=500,
-          title="Répartition géographique des feux par cause, taille",basemap_visible=True)
-      fig7.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
-      fig7.update_layout(title_text="Répartition géographique des feux par cause et taille", title_x = 0.1, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
-      plot_bgcolor='rgba(0,0,0,0)',width=1000, height=700,legend=dict(title=None,x=0.5, y=0.85,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-            family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=50, b=290),titlefont=dict(size=18))   
-      return fig7
-    fig7=scatter_geo_global()
-    fig7
+#  with col1:
+#    @st.cache_data(persist=True)
+#    def scatter_geo_global():
+#      fig7 = px.scatter_geo(FiresClasse,
+#          lon = FiresClasse['LONGITUDE'],
+#          lat = FiresClasse['LATITUDE'],
+#          color="STAT_CAUSE_DESCR",
+#    #    #facet_col="FIRE_YEAR", #pour créer un graph par année
+#    #   #facet_col_wrap,# pour définir le nombre de graph par ligne
+#        #animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
+#          color_discrete_sequence=["blue","orange","red","grey","purple"],
+#          labels={"STAT_CAUSE_DESCR": "Cause"},
+#          hover_name="STATE", # column added to hover information
+#          size=FiresClasse['FIRE_SIZE']/1000, # size of markers
+#          projection='albers usa',
+#          width=800,
+#          height=500,
+#          title="Répartition géographique des feux par cause, taille",basemap_visible=True)
+#      fig7.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
+#      fig7.update_layout(title_text="Répartition géographique des feux par cause et taille", title_x = 0.1, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
+#      plot_bgcolor='rgba(0,0,0,0)',width=1000, height=700,legend=dict(title=None,x=0.5, y=0.85,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+#            family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=50, b=290),titlefont=dict(size=18))   
+#      return fig7
+#    fig7=scatter_geo_global()
+#    fig7
     #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
 
   #with col2:
