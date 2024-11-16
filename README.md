@@ -13,7 +13,7 @@ Ce projet permet de mettre en pratique les différentes étapes d’un projet d�
 
 Environnements techniques : SQL, Python (Pandas, scikit-learn, Matplotlib, Plotly, Seaborn), Streamlit, Git
 
-## 🔥 App - Prédiction feux de forêt aux USA 
+## 🔥 Streamlit App - Prédiction feux de forêt aux USA 
 Cette application vise à prédire la cause des feux de forêt ainsi que la probabilité qu'un feu atteigne une taille critique.
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://wildfire-usa.streamlit.app/)
