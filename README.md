@@ -4,18 +4,17 @@ Dans le cadre de notre formation en analyse de données, nous avons réalisé un
 
 Ce projet permet de mettre en pratique les différentes étapes d’un projet d’analyse de données :
 
-Extraction des données : Extraire les données des feux de forêts via SQL et Webscraping.
-Préprocessing : Nettoyer, préparer, normaliser et encoder les données avec Python (Pandas).
-Exploration : Explorer les tendances et créer des visualisations interactives avec Matplotlib, Plotly et Seaborn.
-Modélisation Machine Learning : Développer des modèles prédictifs pour la classification des causes et de la taille des feux de forêt avec scikit-learn,    
+- Extraction des données : Extraire les données des feux de forêts via SQL et Webscraping.
+- Préprocessing : Nettoyer, préparer, normaliser et encoder les données avec Python (Pandas).
+- Exploration : Explorer les tendances et créer des visualisations interactives avec Matplotlib, Plotly et Seaborn.
+- Modélisation Machine Learning : Développer des modèles prédictifs pour la classification des causes et de la taille des feux de forêt avec scikit-learn,    
                                 en utilisant des techniques avancées telles que le réglage des hyperparamètres, la réduction de dimension et le rééchantillonnage pour améliorer la précision et la robustesse des prédictions.
-Storytelling et restitution : Présenter le projet avec Streamlit.
+- Storytelling et restitution : Présenter le projet avec Streamlit.
 
 Environnements techniques : SQL, Python (Pandas, scikit-learn, Matplotlib, Plotly, Seaborn), Streamlit, Git
 
-Cette application vise à prédire la cause des feux de forêt ainsi que la probabilité qu'un feu atteigne une taille critique. 
-
 ## 🔥 App - Prédiction feux de forêt aux USA 
+Cette application vise à prédire la cause des feux de forêt ainsi que la probabilité qu'un feu atteigne une taille critique.
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://Feux-foret-USA.streamlit.app/)
 
