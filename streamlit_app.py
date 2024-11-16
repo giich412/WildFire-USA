@@ -97,7 +97,7 @@ def load_data():
 df=load_data()
 
 st.sidebar.title("Sommaire")
-pages=["Contexte et présentation", "Preprocessing", "DataVizualization", "Prédiction des causes de feux", "Prédiction des classes de feux", "Conclusion"]
+pages=["Contexte et présentation", "Preprocessing", "DataVizualization", "DataVizualization 2", "Prédiction des causes de feux", "Prédiction des classes de feux", "Conclusion"]
 page=st.sidebar.radio("Aller vers", pages)
 
 # Création contenu de la première page (page 0) avec le contexte et présentation du projet
@@ -397,8 +397,10 @@ if page == pages[2] :
     return fig5
   fig5=durée()
   fig5
- 
- 
+  
+if page == pages[3] : 
+  st.header("DataVizualisation 2")
+  #st.write("Nous avons analysé le dataset sous différents angles afin d’en faire ressortir les principales caractéristiques.")
   st.subheader("4 - Répartition géographique")
   st.markdown("On observe une densité plus élevée de surfaces brûlées à l’ouest des États-Unis, ce qui pourrait être attribué à divers facteurs tels que le climat, la végétation et les activités humaines.")
   st.markdown("**Facteurs Climatiques**- périodes de sécheresse prolongées")
@@ -447,7 +449,7 @@ if page == pages[2] :
     @st.cache_data(persist=True)
     def scatter_geo_global():
       fig7 = px.scatter_geo(FiresClasse,
-         lon = FiresClasse['LONGITUDE'],
+          lon = FiresClasse['LONGITUDE'],
           lat = FiresClasse['LATITUDE'],
           color="STAT_CAUSE_DESCR",
     #    #facet_col="FIRE_YEAR", #pour créer un graph par année
@@ -526,7 +528,7 @@ if page == pages[2] :
   st.write("En analysant ces données plus en détail, on peut mieux comprendre les facteurs qui contribuent aux feux. Ces données soulignent l’importance de la prévention des feux de foret d’origine humaine et de la gestion des risques naturels pour minimiser les dégâts causés par les feux de forêt.")
   
 # Modèles de prédiction des causes
-if page == pages[3] : 
+if page == pages[4] : 
   st.write("## Prédiction des causes de feux")
 
   # Suppression des variables non utiles au ML
@@ -646,7 +648,7 @@ if page == pages[3] :
     return circular_data
   circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
 
-  # TRaitement des variables numériques
+  # Traitement des variables numériques
   @st.cache_data(persist="disk")
   def num_imputer(X):
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
@@ -1125,7 +1127,7 @@ if page == pages[3] :
       st.dataframe(y_pred)
 
 # Modèles de prédiction des classes
-if page == pages[4] :  
+if page == pages[5] :  
 
  @st.cache_data(persist=True)
  def load_FiresML2():
@@ -1420,7 +1422,7 @@ if page == pages[4] :
      st.markdown(":red[Probabilité classe 1 > 50%]")
 
 # Conclusion
-if page == pages[5] : 
+if page == pages[6] : 
   #  st.write("### Conclusion")
   st.write("### Conclusion et propositions d’optimisation")
   st.markdown("""
