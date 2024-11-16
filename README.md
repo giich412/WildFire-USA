@@ -21,3 +21,6 @@ Cette application vise à prédire la cause des feux de forêt ainsi que la prob
 ## GitHub Codespaces
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/app-starter-kit?quickstart=1)
+
+!https://github.com/giich412/WildFire-USA/blob/main/feu_foret.jpg?raw=true
+!My Project logo
