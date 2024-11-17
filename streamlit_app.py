@@ -505,7 +505,7 @@ gc.collect()  # Call garbage collection here
          
      
     
-  st.subheader("5 - Analyse corrélations entre variables")
+st.subheader("5 - Analyse corrélations entre variables")
 # Plot heatmap - correlation matrix for all numerical columns
 #style.use('ggplot')
   
