@@ -421,6 +421,7 @@ if page == pages[2] :
     FiresClasse = df[(Fires_bis['FIRE_SIZE_CLASS'] != "ABC")]
     return FiresClasse
   FiresClasse=load_FiresClasse()
+  gc.collect()
     #fig6 = px.scatter_geo(FiresClasse,
     #      lon = FiresClasse['LONGITUDE'],
     #      lat = FiresClasse['LATITUDE'],
@@ -471,7 +472,7 @@ if page == pages[2] :
 #      return fig7
 #    fig7=scatter_geo_global()
 #    fig7
-gc.collect()  # Call garbage collection here
+#    gc.collect()  # Call garbage collection here
     #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
 
   #with col2:
@@ -500,12 +501,12 @@ gc.collect()  # Call garbage collection here
   #    return fig7_
   #  fig7_=scatter_geo()
   #  fig7_
-gc.collect()  # Call garbage collection here
+  #  gc.collect()  # Call garbage collection here
     #joblib.dump(st.plotly_chart(fig7_),"répartition_géo_mois")
          
      
     
-st.subheader("5 - Analyse corrélations entre variables")
+  st.subheader("5 - Analyse corrélations entre variables")
 # Plot heatmap - correlation matrix for all numerical columns
 #style.use('ggplot')
   
@@ -527,6 +528,7 @@ st.subheader("5 - Analyse corrélations entre variables")
     return fig7b
   fig7b=heat_map()
   fig7b 
+  gc.collect()
 
   st.write("En analysant ces données plus en détail, on peut mieux comprendre les facteurs qui contribuent aux feux. Ces données soulignent l’importance de la prévention des feux de foret d’origine humaine et de la gestion des risques naturels pour minimiser les dégâts causés par les feux de forêt.")
   
@@ -601,6 +603,7 @@ if page == pages[3] :
                - **:red[Criminelle] (1)** : Arson"
                - **:orange[Naturelle] (2)** : Ligthning
                """)
+      gc.collect()
 
   ######################################################################################################################################################################
   ### Fonctions de preprocessing du jeu de données pour le ML ##########################################################################################################
