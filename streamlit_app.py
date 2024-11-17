@@ -196,7 +196,7 @@ if page == pages[2] :
  
   col1, col2 =st.columns([0.55, 0.45],gap="small",vertical_alignment="center")
   with col1 :
-    @st.cache_data(ttl=1200)
+    #@st.cache_data(ttl=1200)
     def plot_violin():
       fig, axes = plt.subplots(2, 3,figsize=(12,7))
       #sns.set_style(style='white')
