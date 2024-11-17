@@ -52,6 +52,7 @@ from sklearn.utils import class_weight
 import joblib
 from itertools import cycle
 import json
+import gc
 
 col1, col2, col3 = st.columns([0.6, 0.25, 0.15], gap="small", vertical_alignment="top")
 with col1:
@@ -97,7 +98,7 @@ def load_data():
 df=load_data()
 
 st.sidebar.title("Sommaire")
-pages=["Contexte et présentation", "Preprocessing", "DataVizualization", "DataVizualization 2", "Prédiction des causes de feux", "Prédiction des classes de feux", "Conclusion"]
+pages=["Contexte et présentation", "Preprocessing", "DataVizualization", "Prédiction des causes de feux", "Prédiction des classes de feux", "Conclusion"]
 page=st.sidebar.radio("Aller vers", pages)
 
 # Création contenu de la première page (page 0) avec le contexte et présentation du projet
@@ -398,8 +399,8 @@ if page == pages[2] :
   fig5=durée()
   fig5
   
-if page == pages[3] : 
-  st.header("DataVizualisation 2")
+#if page == pages[3] : 
+#  st.header("DataVizualisation 2")
   #st.write("Nous avons analysé le dataset sous différents angles afin d’en faire ressortir les principales caractéristiques.")
   st.subheader("4 - Répartition géographique")
   st.markdown("On observe une densité plus élevée de surfaces brûlées à l’ouest des États-Unis, ce qui pourrait être attribué à divers facteurs tels que le climat, la végétation et les activités humaines.")
@@ -470,6 +471,7 @@ if page == pages[3] :
 #      return fig7
 #    fig7=scatter_geo_global()
 #    fig7
+     gc.collect()  # Call garbage collection here
     #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
 
   #with col2:
@@ -498,6 +500,7 @@ if page == pages[3] :
   #    return fig7_
   #  fig7_=scatter_geo()
   #  fig7_
+     gc.collect()  # Call garbage collection here
     #joblib.dump(st.plotly_chart(fig7_),"répartition_géo_mois")
          
      
@@ -528,7 +531,7 @@ if page == pages[3] :
   st.write("En analysant ces données plus en détail, on peut mieux comprendre les facteurs qui contribuent aux feux. Ces données soulignent l’importance de la prévention des feux de foret d’origine humaine et de la gestion des risques naturels pour minimiser les dégâts causés par les feux de forêt.")
   
 # Modèles de prédiction des causes
-if page == pages[4] : 
+if page == pages[3] : 
   st.write("## Prédiction des causes de feux")
 
   # Suppression des variables non utiles au ML
@@ -1127,7 +1130,7 @@ if page == pages[4] :
       st.dataframe(y_pred)
 
 # Modèles de prédiction des classes
-if page == pages[5] :  
+if page == pages[4] :  
 
  @st.cache_data(persist=True)
  def load_FiresML2():
@@ -1422,7 +1425,7 @@ if page == pages[5] :
      st.markdown(":red[Probabilité classe 1 > 50%]")
 
 # Conclusion
-if page == pages[6] : 
+if page == pages[5] : 
   #  st.write("### Conclusion")
   st.write("### Conclusion et propositions d’optimisation")
   st.markdown("""
