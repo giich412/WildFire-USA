@@ -7,4 +7,3 @@ seaborn
 streamlit==1.40.1
 xgboost
 requests
-gc
