@@ -41,7 +41,7 @@ from sklearn.metrics import precision_recall_curve, auc, PrecisionRecallDisplay,
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import GradientBoostingClassifier
 import folium
-from streamlit_folium import st_folium
+#from streamlit_folium import st_folium
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 import sklearn.metrics as metrics
@@ -251,7 +251,7 @@ if page == pages[2] :
   with st.container():
     col1, col2 = st.columns([0.6, 0.40],gap="small",vertical_alignment="center")
     with col1 :
-    #with st.container(height=400):
+    #with st.container(height=400):      
       Fires_class = df.groupby("FIRE_SIZE_CLASS").agg({"FPA_ID":"count", "FIRE_SIZE":"sum"}).reset_index()
       Fires_class = Fires_class.rename({"FPA_ID":"COUNT_FIRE", "FIRE_SIZE":"FIRE_SIZE_SUM"}, axis = 1)
       Indic = ["≈ ", "≈ ","≈ Connecticut", "≈ New Jersey", "≈ Maryland", "≈ Virginie Occidentale + Delaware", "≈ Californie + Hawaii"]
@@ -421,7 +421,7 @@ if page == pages[2] :
     FiresClasse = df[(Fires_bis['FIRE_SIZE_CLASS'] != "ABC")]
     return FiresClasse
   FiresClasse=load_FiresClasse()
-  gc.collect()
+  #gc.collect()
     #fig6 = px.scatter_geo(FiresClasse,
     #      lon = FiresClasse['LONGITUDE'],
     #      lat = FiresClasse['LATITUDE'],
@@ -528,7 +528,7 @@ if page == pages[2] :
     return fig7b
   fig7b=heat_map()
   fig7b 
-  gc.collect()
+ # gc.collect()
 
   st.write("En analysant ces données plus en détail, on peut mieux comprendre les facteurs qui contribuent aux feux. Ces données soulignent l’importance de la prévention des feux de foret d’origine humaine et de la gestion des risques naturels pour minimiser les dégâts causés par les feux de forêt.")
   
@@ -603,7 +603,7 @@ if page == pages[3] :
                - **:red[Criminelle] (1)** : Arson"
                - **:orange[Naturelle] (2)** : Ligthning
                """)
-      gc.collect()
+      #gc.collect()
 
   ######################################################################################################################################################################
   ### Fonctions de preprocessing du jeu de données pour le ML ##########################################################################################################
@@ -692,7 +692,7 @@ if page == pages[3] :
 
 
   # Réduction du modèle avec la méthode feature importances
-  @st.cache_data(persist="disk")
+  @st.cache_resource#@st.cache_data(persist="disk")
   def model_reduction(classifier, X_train, y_train):
     if classifier == "XGBoost":
        clf = XGBClassifier(tree_meethod = "approx",
@@ -759,7 +759,7 @@ if page == pages[3] :
 
   # Enregistrement des meilleurs modèles
   # Best xgb raw model
-  @st.cache_data(persist="disk")
+  @st.cache_resource#@st.cache_data(persist="disk")
   def best_xgb_raw_model(X, y):
       xgb_best_params = {"learning_rate": 0.015,
                         "max_depth": 3, 
@@ -771,7 +771,7 @@ if page == pages[3] :
       model = joblib.load("best_xgb_raw_model.joblib")
       return model
   # Best xgb raw model
-  @st.cache_data(persist="disk")
+  @st.cache_resource#@st.cache_data(persist="disk")
   def best_rf_raw_model(X, y):
      rf_best_params = {"n_estimators": 50,
                       "max_depth": 100,
@@ -783,7 +783,7 @@ if page == pages[3] :
      model = joblib.load("best_rf_raw_model.joblib")
      return model
   # Best LogReg raw model
-  @st.cache_data(persist="disk")
+  @st.cache_resource#@st.cache_data(persist="disk")
   def best_LogReg_raw_model(X, y):
      LogReg_best_params = {"C": 0.1,
                       "solver": "sag",
@@ -793,7 +793,7 @@ if page == pages[3] :
      model = joblib.load("best_lr_raw_model.joblib")
      return model
   # Best Decision Tree raw model
-  @st.cache_data(persist="disk")
+  @st.cache_resource#@st.cache_data(persist="disk")
   def best_DecTree_raw_model(X, y):
      DecTree_best_params = {"criterion": "gini"}
      clf_DecTree = DecisionTreeClassifier(**DecTree_best_params, random_state = 42).fit(X, y)
@@ -806,6 +806,7 @@ if page == pages[3] :
   ######################################################################################################################################################################  
 
   # Labélisation des nouvelles données de prédiction
+  @st.cache_data(persist="disk")
   def real_data_process(data):
     # Initialisation du dataframe pour le ML
     data_shape = data.shape
