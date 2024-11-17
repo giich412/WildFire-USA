@@ -52,6 +52,7 @@ from sklearn.utils import class_weight
 import joblib
 from itertools import cycle
 import json
+import gc
 
 col1, col2, col3 = st.columns([0.6, 0.25, 0.15], gap="small", vertical_alignment="top")
 with col1:
@@ -615,6 +616,7 @@ if page == pages[3] :
     feats = pd.get_dummies(feats, dtype = "int")
     return feats, target
   feats, target = data_labeling(Fires_ML)
+  gc.collect()
 
   # Séparation du jeu en train et test
   @st.cache_data(persist="disk")
@@ -645,7 +647,7 @@ if page == pages[3] :
     # circular_cols = circular_data.columns
     return circular_data
   circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
-
+  gc.collect()
   # TRaitement des variables numériques
   @st.cache_data(persist="disk")
   def num_imputer(X):
@@ -668,7 +670,7 @@ if page == pages[3] :
     X_num = X_num.reset_index(drop = True)
     return X_num
   num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
-
+  gc.collect()
   # Reconstitution du jeu de données après traitement
   @st.cache_data(persist="disk")
   def X_concat(X_train_num, X_test_num, circular_train, circular_test):
@@ -709,7 +711,7 @@ if page == pages[3] :
                                     index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
        feat_imp = list(feat_imp_data.index[-11:])
     return feat_imp
-    
+  gc.collect() 
 
   ######################################################################################################################################################################
   ### Fonctions de visualisation des métriques et graphes ##############################################################################################################
@@ -744,7 +746,7 @@ if page == pages[3] :
         legend_title='Classes'
     )
     return fig 
-  
+  gc.collect()
   ######################################################################################################################################################################
   ### Fonctions d'entrainement sur l'ensemble du jeu d'entrainement et de sauvegarde des meilleurs modèles #############################################################
   ######################################################################################################################################################################  
@@ -762,6 +764,7 @@ if page == pages[3] :
       joblib.dump(clf_xgb, "best_xgb_raw_model.joblib")
       model = joblib.load("best_xgb_raw_model.joblib")
       return model
+  gc.collect()
   # Best xgb raw model
   @st.cache_resource
   def best_rf_raw_model(X, y):
@@ -774,6 +777,7 @@ if page == pages[3] :
      joblib.dump(clf_rf, "best_rf_raw_model.joblib")
      model = joblib.load("best_rf_raw_model.joblib")
      return model
+  gc.collect()
   # Best LogReg raw model
   @st.cache_resource
   def best_LogReg_raw_model(X, y):
@@ -784,6 +788,7 @@ if page == pages[3] :
      joblib.dump(clf_LogReg, "best_lr_raw_model.joblib")
      model = joblib.load("best_lr_raw_model.joblib")
      return model
+  gc.collect()
   # Best Decision Tree raw model
   @st.cache_resource
   def best_DecTree_raw_model(X, y):
@@ -792,6 +797,7 @@ if page == pages[3] :
      joblib.dump(clf_DecTree, "best_DecTree_raw_model.joblib")
      model = joblib.load("best_DecTree_raw_model.joblib")
      return model
+  gc.collect()
 
   ######################################################################################################################################################################
   ### Fonctions de labelisation de set de données fournies en input pour une prédiction en temps réelles (en phase de production) ######################################
@@ -827,7 +833,7 @@ if page == pages[3] :
           else:
              X.loc[i, state] = 0
     return X
-  
+  gc.collect()
   
 
     # FIPS CODE par STATE
