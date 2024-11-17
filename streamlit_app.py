@@ -40,8 +40,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import precision_recall_curve, auc, PrecisionRecallDisplay, average_precision_score, roc_auc_score  
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import GradientBoostingClassifier
-#import folium
-#from streamlit_folium import st_folium
+import folium
+from streamlit_folium import st_folium
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 import sklearn.metrics as metrics
@@ -103,428 +103,452 @@ page=st.sidebar.radio("Aller vers", pages)
 
 # Création contenu de la première page (page 0) avec le contexte et présentation du projet
 if page == pages[0] : 
-  st.write("### Contexte et présentation du projet")
-  #st.image("ImageFeu.jpg")
-  st.image("feu_foret.jpg", caption="Feu de forêt en Californie du Nord", width=500)
-  st.markdown("""<div style="text-align: justify;">
+    st.write("### Contexte et présentation du projet")
+    st.image("feu_foret.jpg", caption="Feu de forêt en Californie du Nord", width=500)
+    st.markdown("""<div style="text-align: justify;">
               Nous sommes en réorientation professionnelle et cherchons à approfondir nos compétences en data analysis. Ce projet nous permet de mettre en pratique les méthodes et outils appris durant notre formation, de l’exploration des données à la modélisation et la data visualisation.
               </div>""", unsafe_allow_html=True)
-  st.write("""
-    ### Étapes du projet :
-    - **Nettoyage et pré-processing des données**
-    - **Storytelling avec DataViz** (Plotly, seaborn, matplotlib)
-    - **Construction de modèles de Machine Learning**
-    - **Restitution via Streamlit**
-    ### Objectif :
-    Le projet vise à prédire les incendies de forêt pour améliorer la prévention et l’intervention, ainsi que la détection humaine ou naturelle des départs de feu et l’évaluation des risques de grande ampleur, dans un contexte de préservation de l’environnement, de sécurité publique et d’impacts économiques significatifs.
-    ### Données utilisées :
-    Nous utilisons des données provenant du **US Forest Service**, qui centralise les informations sur les incendies de forêt aux États-Unis. Ces données incluent les causes des incendies, les surfaces touchées, et leurs localisations. Nous intégrons également des données météorologiques (vent, température, humidité) provenant du **National Interagency Fire Center** pour évaluer les risques de départ et de propagation des feux.
-    ### Applications :
-    - Prévention des incendies criminels et anticipation des feux dus à la foudre.
-    - Évaluation des risques de grande taille.
-    """)
+    st.write("""
+      ### Étapes du projet :
+      - **Nettoyage et pré-processing des données**
+      - **Storytelling avec DataViz** (Plotly, seaborn, matplotlib)
+      - **Construction de modèles de Machine Learning**
+      - **Restitution via Streamlit**
+      ### Objectif :
+      Le projet vise à prédire les incendies de forêt pour améliorer la prévention et l’intervention, ainsi que la détection humaine ou naturelle des départs de feu et l’évaluation des risques de grande ampleur, dans un contexte de préservation de l’environnement, de sécurité publique et d’impacts économiques significatifs.
+      ### Données utilisées :
+      Nous utilisons des données provenant du **US Forest Service**, qui centralise les informations sur les incendies de forêt aux États-Unis. Ces données incluent les causes des incendies, les surfaces touchées, et leurs localisations. Nous intégrons également des données météorologiques (vent, température, humidité) provenant du **National Interagency Fire Center** pour évaluer les risques de départ et de propagation des feux.
+      ### Applications :
+      - Prévention des incendies criminels et anticipation des feux dus à la foudre.
+      - Évaluation des risques de grande taille.
+      """)
 
 # Création de la page 1 avec explication du préprocessing     
-#if page == pages[1] : 
-
-if page == pages[1]:
-
-  st.write("### Preprocessing")
-  # Nettoyage des données
-  st.write("#### Explication de nettoyage des données")
-  st.write("""
-    Le jeu de données original contenait 38 colonnes et 1 880 465 lignes. Après une révision détaillée, 
-    il a été décidé de ne conserver que 14 colonnes en raison de la présence de données incomplètes ou répétées dans les autres colonnes.
-    Voici les colonnes originales et celles conservées :
-    """)
-
-  
+elif page == pages[1]:
+    st.write("### Preprocessing")
+    st.write("#### Explication de nettoyage des données")
+    st.write("""
+      Le jeu de données original contenait 38 colonnes et 1 880 465 lignes. Après une révision détaillée, 
+      il a été décidé de ne conserver que 14 colonnes en raison de la présence de données incomplètes ou répétées dans les autres colonnes.
+      Voici les colonnes originales et celles conservées :
+      """)
+ 
     # Afficher les colonnes originales et celles conservées
-  
-  st.write("#### Colonnes Originales")
-  if st.checkbox("Afficher jeu données ") :
-    st.write("#### Jeu de données et statistiques")
-    st.dataframe(df.head())
-    st.write("#### Statistiques")
-    st.dataframe(df.describe(), use_container_width=True)
+    st.write("#### Colonnes Originales")
+    if st.checkbox("Afficher jeu données ") :
+      st.write("#### Jeu de données et statistiques")
+      st.dataframe(df.head())
+      st.write("#### Statistiques")
+      st.dataframe(df.describe(), use_container_width=True)
 
-
-  st.write("#### Colonnes Conservées")
-  conserved_columns = [
-        "FPA_ID", "NWCG_REPORTING_UNIT_NAME", "FIRE_YEAR", "DISCOVERY_DATE", 
-        "DISCOVERY_DOY", "STAT_CAUSE_DESCR", "CONT_DOY", "FIRE_SIZE", "FIRE_SIZE_CLASS", 
-        "LATITUDE", "LONGITUDE", "STATE", "FIPS_NAME"
-    ]
-  if st.checkbox("Afficher les colonnes conservées "):
-        st.dataframe(df[conserved_columns].head())
+    st.write("#### Colonnes Conservées")
+    conserved_columns = [
+          "FPA_ID", "NWCG_REPORTING_UNIT_NAME", "FIRE_YEAR", "DISCOVERY_DATE", 
+          "DISCOVERY_DOY", "STAT_CAUSE_DESCR", "CONT_DOY", "FIRE_SIZE", "FIRE_SIZE_CLASS", 
+          "LATITUDE", "LONGITUDE", "STATE", "FIPS_NAME"
+      ]
+    if st.checkbox("Afficher les colonnes conservées "):
+      st.dataframe(df[conserved_columns].head())
   
 
     # Explication du nettoyage des données
-  st.write("""
-    Les colonnes conservées ont été sélectionnées car elles contiennent des informations pertinentes et complètes 
-    pour l'analyse des incendies de forêt. Les colonnes supprimées avaient des données incomplètes 
-    ou répétées qui n'apportaient pas de valeur significative à l'analyse.
-    """)
+    st.write("""
+      Les colonnes conservées ont été sélectionnées car elles contiennent des informations pertinentes et complètes 
+      pour l'analyse des incendies de forêt. Les colonnes supprimées avaient des données incomplètes 
+      ou répétées qui n'apportaient pas de valeur significative à l'analyse.
+      """)
 
-  st.write("#### Colonnes Ajoutées")
-  st.write("""
-    En plus des colonnes conservées, nous avons ajouté les colonnes MONTH_DISCOVERY, DAY_OF_WEEK_DISCOVERY et DISCOVERY_WEEK à partir des transformations de la colonne DISCOVERY_DATE en format de date avec pd.to_datetime :
-    - `MONTH_DISCOVERY` : Le mois de la découverte de l'incendie.
-    - `DAY_OF_WEEK_DISCOVERY` : Le jour de la semaine de la découverte de l'incendie.
-    - `DISCOVERY_WEEK` : Numéro de la semaine de la découverte de l’incendie.
-    - `DURATION` : La durée de l'incendie en jours.
-    """)
-  st.write("""
-    Nous avons aussi ajouté les colonnes avg temp et avg pcp à partir de la base de données du National Interagency Fire Center:
-    - `AVG_TEMP [°C]` : Température moyenne en degrés Celsius
-    - `AVG_PCP [mm]` : Précipitations moyennes, utilisé pour mesurer la quantité moyenne de précipitations (pluie ou neige) qui tombe dans une région spécifique sur une période de temps donnée.
-    """)
+    st.write("#### Colonnes Ajoutées")
+    st.write("""
+      En plus des colonnes conservées, nous avons ajouté les colonnes MONTH_DISCOVERY, DAY_OF_WEEK_DISCOVERY et DISCOVERY_WEEK à partir des transformations de la colonne DISCOVERY_DATE en format de date avec pd.to_datetime :
+      - `MONTH_DISCOVERY` : Le mois de la découverte de l'incendie.
+      - `DAY_OF_WEEK_DISCOVERY` : Le jour de la semaine de la découverte de l'incendie.
+      - `DISCOVERY_WEEK` : Numéro de la semaine de la découverte de l’incendie.
+      - `DURATION` : La durée de l'incendie en jours.
+      """)
+    st.write("""
+      Nous avons aussi ajouté les colonnes avg temp et avg pcp à partir de la base de données du National Interagency Fire Center:
+      - `AVG_TEMP [°C]` : Température moyenne en degrés Celsius
+      - `AVG_PCP [mm]` : Précipitations moyennes, utilisé pour mesurer la quantité moyenne de précipitations (pluie ou neige) qui tombe dans une région spécifique sur une période de temps donnée.
+      """)
 
-
-  #if st.checkbox("Afficher la dimension") :
-  #   st.write(f"La dimension : {df.shape}")
-  st.write("""
-    Nous avons éliminé les colonnes non pertinentes ou avec trop de valeurs manquantes, notamment celles liées aux codes d’identification des agences, car elles n’étaient pas utiles pour notre analyse:""")
-  if st.checkbox("Afficher les na") :
-    st.dataframe(df.isna().sum(), width=300, height=640)
+    #if st.checkbox("Afficher la dimension") :
+    #   st.write(f"La dimension : {df.shape}")
+    st.write("""
+      Nous avons éliminé les colonnes non pertinentes ou avec trop de valeurs manquantes, notamment celles liées aux codes d’identification des agences, car elles n’étaient pas utiles pour notre analyse:""")
+    if st.checkbox("Afficher les na") :
+      st.dataframe(df.isna().sum(), width=300, height=640)
       
 # Création de la page 2 Datavizualisation
-if page == pages[2] : 
-  st.header("DataVizualisation")
-  #st.write("Nous avons analysé le dataset sous différents angles afin d’en faire ressortir les principales caractéristiques.")
-  st.subheader("1 - Analyse des outliers et de la répartitions des valeurs numériques")
- 
-  col1, col2 =st.columns([0.55, 0.45],gap="small",vertical_alignment="center")
-  with col1 :
-    #@st.cache_data(ttl=1200)
-    def plot_violin():
-      fig, axes = plt.subplots(2, 3,figsize=(12,7))
-      #sns.set_style(style='white')
-      sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
-      sns.set_theme()
-      sns.violinplot(ax=axes[0, 0], x=df['DURATION'])
-      sns.violinplot(ax=axes[0, 1],x=df['FIRE_SIZE'])
-      sns.violinplot(ax=axes[0, 2],x=df['AVG_PCP [mm]'])
-      sns.violinplot(ax=axes[1,0],x=df['LATITUDE'])
-      sns.violinplot(ax=axes[1, 1],x=df['LONGITUDE'])
-      sns.violinplot(ax=axes[1, 2],x=df['AVG_TEMP [°C]'])
-      return fig
-    fig=plot_violin()
-    fig 
+elif page == pages[2] : 
+    st.header("DataVizualisation")
 
-  with col2 :
-    #st.divider()
-
-    st.markdown("Certaines variables comme les tailles de feux et les durées présentent des valeurs particulièrement extrêmes.")  
-    st.markdown("Certaines valeurs extrêmes paraissent impossibles et devront être écartées des analyses (exemple feux de plus de 1 an). A l'inverse les feux de taille extrêmes restent des valeurs possibles (méga feux) et seront partie intégrante de nos analyses")
+    # Subcategories for DataVisualization
+    subpages = ["1 - Analyse des outliers", "2 - Répartition par cause", "3- Répartition par taille"]
+    subpage = st.radio("Sélectionnez une sous-page", subpages)
     
-    st.markdown("Les autres variables numériques (précipitations, températures ou coordonnées géographiques) nous indiquent certaines tendances marquées sur la répartition des feux que nous allons analyser plus en détail.")
-    
-    #st.divider()
+    if subpage == subpages[0]:
+        st.subheader("1 - Analyse des outliers et de la répartitions des valeurs numériques")
+        col1, col2 =st.columns([0.55, 0.45],gap="small",vertical_alignment="center")
+        with col1 :
+          @st.cache_data(ttl=1200)
+          def plot_violin():
+            fig, axes = plt.subplots(2, 3,figsize=(12,7))
+            #sns.set_style(style='white')
+            sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
+            sns.set_theme()
+            sns.violinplot(ax=axes[0, 0], x=df['DURATION'])
+            sns.violinplot(ax=axes[0, 1],x=df['FIRE_SIZE'])
+            sns.violinplot(ax=axes[0, 2],x=df['AVG_PCP [mm]'])
+            sns.violinplot(ax=axes[1,0],x=df['LATITUDE'])
+            sns.violinplot(ax=axes[1, 1],x=df['LONGITUDE'])
+            sns.violinplot(ax=axes[1, 2],x=df['AVG_TEMP [°C]'])
+            return fig
+          fig=plot_violin()
+          fig 
 
-  st.subheader("2 - Répartition des feux par cause et classe")
-  with st.container():
-  #with st.container(height=360):
-    col1, col2 = st.columns([0.6, 0.4],gap="small",vertical_alignment="center")
-    with col1 :
-      Fires_cause = df.groupby("STAT_CAUSE_DESCR").agg({"FPA_ID":"count", "FIRE_SIZE":"sum"}).reset_index()
-      Fires_cause = Fires_cause.rename({"FPA_ID":"COUNT_FIRE", "FIRE_SIZE":"FIRE_SIZE_SUM"}, axis = 1)
-      Indic = ["≈ Hawaii + Massachusetts", "≈ Hawaii + Massachusetts", "≈ Washington + Georgia", "≈ Maine", "≈ New Jersey + Massachusetts"]
-      Fires_cause["Text"] = Indic
-      fig = make_subplots(rows = 1, cols = 2,specs = [[{"type":"domain"}, {"type":"domain"}]])
-      fig.add_trace(go.Pie(labels = Fires_cause["STAT_CAUSE_DESCR"],values = Fires_cause["COUNT_FIRE"],hole = 0.6,
-        direction = "clockwise", title = dict(text = "Nombre", font=dict(size=20))),row = 1, col = 1,)
-      fig.add_trace(go.Pie(labels = Fires_cause["STAT_CAUSE_DESCR"],values = Fires_cause["FIRE_SIZE_SUM"],hovertext = Fires_cause["Text"],
-         hole = 0.6,direction = "clockwise",title = dict(text = "Surfaces (acres)", font=dict(size=20))),row = 1, col = 2)
-      fig.update_traces(textfont_size=15,sort=False,marker=dict(colors=['#F1C40F', '#F39C12', '#e74c3c','#E67E22','#d35400']))
-      fig.update_layout(title_text="Répartition des feux par causes (1992 - 2015)", title_x = 0.2, title_y =0.99,paper_bgcolor='rgba(0,0,0,0)',
-      plot_bgcolor='rgba(0,0,0,0)',legend=dict(x=0.0, y=0.95,orientation="h",font=dict(
-            family="Arial",size=12,color="black")),margin=dict(l=10, r=10, t=2, b=0),titlefont=dict(size=15),width=900,height=350)
-      #joblib.dump(st.plotly_chart(fig),"répartition_feux_acres")
-  #Pie Chart répartition par cause
-    with col2 :
-  #if st.checkbox("Afficher graphiques par cause") :   
-      st.markdown(":orange[Les feux d’origine humaine] (volontaire et involontaire) représentent :orange[50% des départs].")
-    
-      st.markdown(":orange[Les causes naturelles] (foudre) représentent :orange[62,1% des surfaces brûlées].")
-   
-  with st.container():
-    col1, col2 = st.columns([0.6, 0.40],gap="small",vertical_alignment="center")
-    with col1 :
-    #with st.container(height=400):
-      Fires_class = df.groupby("FIRE_SIZE_CLASS").agg({"FPA_ID":"count", "FIRE_SIZE":"sum"}).reset_index()
-      Fires_class = Fires_class.rename({"FPA_ID":"COUNT_FIRE", "FIRE_SIZE":"FIRE_SIZE_SUM"}, axis = 1)
-      Indic = ["≈ ", "≈ ","≈ Connecticut", "≈ New Jersey", "≈ Maryland", "≈ Virginie Occidentale + Delaware", "≈ Californie + Hawaii"]
-      Fires_class["Text"] = Indic
-      fig1= make_subplots(rows = 1, cols = 2, specs = [[{"type":"domain"}, {"type":"domain"}]])
-      fig1.add_trace(go.Pie(labels = Fires_class["FIRE_SIZE_CLASS"],values = Fires_class["COUNT_FIRE"],
-           hole = 0.6, rotation = 0,title = dict(text = "Nombre", font=dict(size=20))),row = 1, col = 1)
-      fig1.add_trace(go.Pie(labels = Fires_class["FIRE_SIZE_CLASS"],values = Fires_class["FIRE_SIZE_SUM"],
-           hovertext = Fires_class["Text"],hole = 0.6, rotation = -120,title = dict(text = "Surfaces (acres)", font=dict(size=20))),
-      row = 1, col = 2)
-      fig1.update_traces(textfont_size=15,sort=False,marker=dict(colors=['yellow','brown','#F1C40F', '#F39C12', '#e74c3c','#E67E22','#d35400']))
-      fig1.update_layout(title_text="Répartition des feux suivant leur taille (1992 - 2015)", title_x = 0.2, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
-      plot_bgcolor='rgba(0,0,0,0)',legend=dict(x=0.2, y=0.95,orientation="h",font=dict(
-            family="Arial",size=12,color="black")),margin=dict(l=10, r=10, t=2, b=0),titlefont=dict(size=15),width=900,height=350)
-      #joblib.dump(st.plotly_chart(fig1),"répartition_feux_nb")
-    with col2 :      
-      st.write(":orange[Les feux de petite taille (A et B, <9,9 acres)] représentent :orange[62 % du nombre de départs] mais seulement :orange[2% des surfaces brûlées].  :orange[78 % des surfaces brûlées sont liées aux feux de la classe G] (avec des feux allant de 5000 à 600 000 acres).")
-      
-
-  st.subheader("3 - Répartition temporelle des feux")
-  st.write("Cet axe révèle assez clairement des périodes à risque sur les départs et la gravité des feux")
-#Histogrammes année
-  st.write("**Variabilité annuelle**")
-  st.write("Certaines années semblent clairement plus propices aux départs de feux. Cela peut s’expliquer par les conditions météorologiques. On observe notamment que les années où les surfaces brûlées sont significativement supérieures à la moyenne cela est dû à la foudre")
-  #if st.checkbox("Afficher graphiques année") :
-    #fig2 = make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("Surfaces brûlées (acres)","Nombre de départs"))
-    #fig2.add_trace(go.Histogram(histfunc="sum",
-    #  name="Surface brûlées (acres) ",
-    #  x=df['FIRE_YEAR'],y=df['FIRE_SIZE'], marker_color='red'),1,1)
-    #fig2.add_trace(go.Histogram(histfunc="count",
-    #  name="Nombre de feux",
-    #  x=df['FIRE_YEAR'],marker_color='blue'),1,2)
-    #fig2.update_layout(title_text="Départs de feux par année",bargap=0.2,height=400, width=1100, coloraxis=dict(colorscale='Bluered_r'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
-    #plot_bgcolor='rgba(0,0,0,0)')
-    #st.plotly_chart(fig2)
-
-  df1=df.groupby(['STAT_CAUSE_DESCR', 'FIRE_YEAR']).agg({"FIRE_SIZE":"sum"}).reset_index()
-  df1bis=df.groupby(['STAT_CAUSE_DESCR', 'FIRE_YEAR']).agg({"FPA_ID":"count"}).reset_index()
-  col1, col2 = st.columns([0.5, 0.5],gap="small",vertical_alignment="center")  
-  with col1 :
-    @st.cache_data(ttl=1200)
-    def graph_annee():
-      fig2bis = px.area(df1, 'FIRE_YEAR' , "FIRE_SIZE", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")    
-      fig2bis.update_layout(xaxis_title="",yaxis_title="",title_text="Répartition des feux par année et cause (en acres)", title_x = 0.2, title_y = 0.99,paper_bgcolor='rgba(0,0,0,0)',
-      plot_bgcolor='rgba(0,0,0,0)',width=700, height=350,legend=dict(x=0, y=1,title=None,orientation="v",font=dict(
-            family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=20, b=50),titlefont=dict(size=15))
-      return fig2bis
-    fig2bis=graph_annee()
-    fig2bis
-
-  with col2 :
-    @st.cache_data(ttl=1200)
-    def graph_annee_nombre():
-      fig3bis = px.area(df1bis, 'FIRE_YEAR' , "FPA_ID", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")
-      fig3bis.update_layout(xaxis_title="",yaxis_title="",title_text="Répartition des feux par année et cause (en nombre)", title_x = 0.2, title_y = 0.99,paper_bgcolor='rgba(0,0,0,0)',
-      plot_bgcolor='rgba(0,0,0,0)',width=700, height=350,legend=dict(title=None,x=0, y=1,orientation="v",font=dict(
-            family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=20, b=00),titlefont=dict(size=15))
-      return fig3bis
-    fig3bis=graph_annee_nombre()
-    fig3bis
-#Histogrammes mois
-  st.write("**Périodes à risque**")
-  st.write("Les mois de juin à août sont les plus dévastateurs ce qui qui peut sous-entendre 2 facteurs : un climat plus favorable aux départs de feux, des activités humaines à risque plus élevées pendant les périodes de vacances")
-  #if st.checkbox("Afficher graphiques mois") :
-  @st.cache_data(ttl=1200)
-  def hist_mois_acres_nb():
-    fig3= make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("En surfaces brûlées (acres)","En Nombre de départs"))
-    fig3.add_trace(go.Histogram(histfunc="sum",
-      name="Surface brûlées (acres) ",
-      x=df['MONTH_DISCOVERY'],y=df['FIRE_SIZE'], marker_color='red'),1,1)
-    fig3.add_trace(go.Histogram(histfunc="count",
-      name="Nombre de feux",
-      x=df['MONTH_DISCOVERY'],marker_color='blue'),1,2)
-    fig3.update_layout(title_text="Départs de feux par mois",bargap=0.2,height=400, width=1100, coloraxis=dict(colorscale='Bluered_r'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)')
-    return fig3
-  fig3=hist_mois_acres_nb()
-  fig3
-
-
-#Histogrammes jour semaine
-  st.write("**Corrélation avec les feux d’origine humaine**")   
-  st.write("On observe également des départs de feux significativement plus élevés le week-end. Ce qui peut être mis en corrélation avec les feux d'origine humaine déclenchés par des activités à risque plus propices en périodes de week-end (feux de camps...)")
-  #if st.checkbox("Afficher graphiques jour de la semaine") :
-  @st.cache_data(ttl=1200)
-  def hist_jours_acres_nb():
-    df['DAY_OF_WEEK_DISCOVERYName'] = pd.to_datetime(df['DISCOVERY_DATE']).dt.day_name()
-    Fires2=df.loc[df['STAT_CAUSE_DESCR']!="Foudre"]
-    Fires3 = Fires2.groupby('DAY_OF_WEEK_DISCOVERYName')['FPA_ID'].value_counts().groupby('DAY_OF_WEEK_DISCOVERYName').sum()
-    week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    Fires3 = Fires3.reindex(week)
-    Fires4 = Fires2.groupby('DAY_OF_WEEK_DISCOVERYName')['FIRE_SIZE'].sum()
-    week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    Fires4 = Fires4.reindex(week)
-    fig4 = make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("En surfaces brûlées (acres)","En Nombre de départs"))
-    fig4.add_trace(go.Histogram(histfunc="sum",
-      name="Surface brûlées (acres) ",
-      x=Fires4.index,y=Fires4.values, marker_color='red'),1,1)
-    fig4.add_trace(go.Histogram(histfunc="sum",
-      name="Nombre de feux",
-      x=Fires3.index,y=Fires3.values,marker_color='blue'),1,2)
-    fig4.update_layout(title_text="Départs de feux en fonction du jour de la semaine",bargap=0.2,height=400, width=1000, coloraxis=dict(colorscale='Bluered_r'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)')
-    return fig4
-  fig4=hist_jours_acres_nb()
-  fig4
-
-  df3=df.groupby(['STAT_CAUSE_DESCR', 'DISCOVERY_DOY']).agg({"FIRE_SIZE":"sum"}).reset_index()
-
-  @st.cache_data(ttl=1200)
-  def jour_cause(): 
-    fig4bis = px.area(df3, 'DISCOVERY_DOY' , "FIRE_SIZE", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")
-    fig4bis.update_layout(title_text="Répartition des feux jours de l'année et cause (en acres)", title_x = 0.3, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)',width=1000, height=400,legend=dict(title=None,x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-            family="Arial",size=15,color="black")),margin=dict(l=100, r=100, t=25, b=50),titlefont=dict(size=20))
-    return fig4bis
-  fig4bis=jour_cause()
-  fig4bis
-
-# Durée moyenne
-  st.write('L’analyse de la durée des feux par cause montre une certaine hétérogénéité de la durée des feux en fonction de la cause. Les feux liés à la foudre sont en moyenne deux fois plus longs à contenir que les autres types de feux')
-  st.write("La Foudre : Les feux déclenchés par la foudre sont souvent situés dans des zones difficiles d’accès, ce qui complique les efforts de lutte contre les incendies. De plus, ces feux peuvent se propager rapidement en raison des conditions météorologiques associées aux orages, comme les vents forts.")
-  #if st.checkbox("Afficher graphiques par durée") :
-  @st.cache_data(ttl=1200)
-  def durée(): 
-    Fires_burn = df.dropna(subset=['CONT_DOY', 'DISCOVERY_DOY']).copy()
-    Fires_burn['CONT_DOY'] = Fires_burn['CONT_DOY'].astype(int)
-    Fires_burn['DISCOVERY_DOY'] = Fires_burn['DISCOVERY_DOY'].astype(int)
-    Fires_burn['BURN_TIME'] = Fires_burn['CONT_DOY'] - Fires_burn['DISCOVERY_DOY']
-    Fires_burn.loc[Fires_burn['BURN_TIME'] < 0, 'BURN_TIME'] += 365
-    cause_avg_burn_time = Fires_burn.groupby('STAT_CAUSE_DESCR', dropna=True)['BURN_TIME'].mean().reset_index()
-    cause_avg_burn_time.sort_values(by='BURN_TIME', ascending=False, inplace=True)
-    fig5 = px.bar(
-    cause_avg_burn_time,
-      x='BURN_TIME',
-      y='STAT_CAUSE_DESCR',
-      labels={"STAT_CAUSE_DESCR": "Cause", "BURN_TIME": "Durée moyenne (jours)"},
-      title='Durée moyenne des feux par cause',
-      orientation='h',  # Horizontal orientation
-      color='STAT_CAUSE_DESCR',
-      color_discrete_sequence=px.colors.sequential.Reds_r)
-    fig5.update_layout(xaxis=dict(tickmode='linear', dtick=0.5),title_x = 0.3, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)',width=1000, height=400,showlegend=False,margin=dict(l=170, r=200, t=50, b=50),titlefont=dict(size=20))
-    return fig5
-  fig5=durée()
-  fig5
- 
- 
-#  st.subheader("4 - Répartition géographique")
-#  st.markdown("On observe une densité plus élevée de surfaces brûlées à l’ouest des États-Unis, ce qui pourrait être attribué à divers facteurs tels que le climat, la végétation et les activités humaines.")
-#  st.markdown("**Facteurs Climatiques**- périodes de sécheresse prolongées")
-#  st.markdown("**Végétations**- type de végétation vulnérables aux feux et contribule à la propagation des feux")
-#  st.markdown("**Activités humaines**- l’urbanisation croissante dans les zones à risque, les pratiques agricoles, et les loisirs en plein air augmentent la probabilité de départs de feux")
-  @st.cache_data(ttl=1200)
-  def load_FiresClasse():
-    Fires_bis = df
-    modif1 = ["Campfire", "Debris Burning", "Smoking", "Fireworks", "Children"]
-    modif2 = ["Powerline", "Railroad", "Structure", "Equipment Use"]
-    Fires_bis["STAT_CAUSE_DESCR"] = Fires_bis["STAT_CAUSE_DESCR"].replace("Missing/Undefined", "Miscellaneous")
-    Fires_bis["STAT_CAUSE_DESCR"] = Fires_bis["STAT_CAUSE_DESCR"].replace(modif1, "Origine humaine")
-    Fires_bis["STAT_CAUSE_DESCR"] = Fires_bis["STAT_CAUSE_DESCR"].replace(modif2, "Equipnt Infrastr")
-    Fires_bis["FIRE_SIZE_CLASS"] = Fires_bis["FIRE_SIZE_CLASS"].replace(["A", "B", "C"], "ABC")
-    Fires_bis["FIRE_SIZE_CLASS"] = Fires_bis["FIRE_SIZE_CLASS"].replace(["D", "E", "F"], "DEF")
-    FiresClasse = df[(Fires_bis['FIRE_SIZE_CLASS'] != "ABC")&(df['FIRE_SIZE_CLASS'] != "B")&(df['FIRE_SIZE_CLASS'] != "C")&(df['FIRE_SIZE_CLASS'] != "D")]
-    FiresClasse = df[(Fires_bis['FIRE_SIZE_CLASS'] != "ABC")]
-    return FiresClasse
-  FiresClasse=load_FiresClasse()
-    #fig6 = px.scatter_geo(FiresClasse,
-    #      lon = FiresClasse['LONGITUDE'],
-    #      lat = FiresClasse['LATITUDE'],
-    #      color="STAT_CAUSE_DESCR",
-    #          #facet_col="FIRE_YEAR", #pour créer un graph par année
-     #   #facet_col_wrap,# pour définir le nombre de graph par ligne
-      #  #animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
-    #      color_discrete_sequence=["blue","orange","red","grey","purple"],
-    #      labels={"STAT_CAUSE_DESCR": "Cause"},
-    #      hover_name="STATE", # column added to hover information
-    #      size=FiresClasse['FIRE_SIZE']/1000, # size of markers
-    #      projection='albers usa',
-    #      locationmode = 'USA-states',
-    #      width=800,
-    #      height=500,
-    #      title="Répartition géographique des feux par cause et taille",basemap_visible=True)
-    #fig6.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
-    #fig6.update_layout(title_text="Répartition géographique des feux par cause et taille", title_x = 0.3, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
-    #plot_bgcolor='rgba(0,0,0,0)',width=1000, height=500,legend=dict(x=0.5, y=1.05,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-    #        family="Arial",size=15,color="black")),margin=dict(l=50, r=50, t=100, b=50),titlefont=dict(size=20))      ,
-    
-    #st.plotly_chart(fig6)
-  #if st.checkbox("Afficher graphiques répartition géographique et année") :
-  #col1, col2 = st.columns(2)
-
-  #with col1:
-  #  @st.cache_data(persist=True)
-  #  def scatter_geo_global():
-  #    fig7 = px.scatter_geo(FiresClasse,
-  #       lon = FiresClasse['LONGITUDE'],
-  #        lat = FiresClasse['LATITUDE'],
-  #        color="STAT_CAUSE_DESCR",
-    #    #facet_col="FIRE_YEAR", #pour créer un graph par année
-     #   #facet_col_wrap,# pour définir le nombre de graph par ligne
-        #animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
-  #        color_discrete_sequence=["blue","orange","red","grey","purple"],
-  #       labels={"STAT_CAUSE_DESCR": "Cause"},
-  #        hover_name="STATE", # column added to hover information
-  #        size=FiresClasse['FIRE_SIZE']/1000, # size of markers
-  #        projection='albers usa',
-  #        width=800,
-  #        height=500,
-  #        title="Répartition géographique des feux par cause, taille",basemap_visible=True)
-  #    fig7.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
-  #    fig7.update_layout(title_text="Répartition géographique des feux par cause et taille", title_x = 0.1, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
-  #    plot_bgcolor='rgba(0,0,0,0)',width=1000, height=700,legend=dict(title=None,x=0.5, y=0.85,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-  #          family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=50, b=290),titlefont=dict(size=18))   
-  #    return fig7
-  #  fig7=scatter_geo_global()
-  #  fig7
-    #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
-
-  #with col2:
-
-  #  @st.cache_data(persist=True)
-  #  def scatter_geo():
-  #    fig7_ = px.scatter_geo(FiresClasse,
-  #       lon = FiresClasse['LONGITUDE'],
-  #        lat = FiresClasse['LATITUDE'],
-  #        color="STAT_CAUSE_DESCR",
-  #  #    #facet_col="FIRE_YEAR", #pour créer un graph par année
-  #   #   #facet_col_wrap,# pour définir le nombre de graph par ligne
-  #        animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
-  #        color_discrete_sequence=["blue","orange","red","grey","purple"],
-  #        labels={"STAT_CAUSE_DESCR": "Cause"},
-  #        hover_name="STATE", # column added to hover information
-  #        size=FiresClasse['FIRE_SIZE']/1000, # size of markers
-  #        projection='albers usa',
-  #        width=800,
-  #        height=500,
-  #        title="Focus par année",basemap_visible=True)
-  #    fig7_.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
-  #    fig7_.update_layout(title_text="Focus par année", title_x = 0.4, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
-  #    plot_bgcolor='rgba(0,0,0,0)',width=1000, height=500,legend=dict(title=None,x=0.5, y=0.95,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-  #          family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=100, b=50),titlefont=dict(size=18))   
-  #    return fig7_
-  #  fig7_=scatter_geo()
-  #  fig7_
-    #joblib.dump(st.plotly_chart(fig7_),"répartition_géo_mois")
-         
-     
-    
-  st.subheader("5 - Analyse corrélations entre variables")
-# Plot heatmap - correlation matrix for all numerical columns
-#style.use('ggplot')
+        with col2 :
+          st.markdown("Certaines variables comme les tailles de feux et les durées présentent des valeurs particulièrement extrêmes.")  
+          st.markdown("Certaines valeurs extrêmes paraissent impossibles et devront être écartées des analyses (exemple feux de plus de 1 an). A l'inverse les feux de taille extrêmes restent des valeurs possibles (méga feux) et seront partie intégrante de nos analyses")
+          st.markdown("Les autres variables numériques (précipitations, températures ou coordonnées géographiques) nous indiquent certaines tendances marquées sur la répartition des feux que nous allons analyser plus en détail.")
   
-  #if st.checkbox("Afficher heatmap") :
-  st.write('Cette matrice permet d’identifier quelles variables ont de fortes corrélations entre elles, ce qui nous aide à **sélectionner les caractéristiques les plus pertinentes** pour notre modèle de Machine Learning.')
-  st.write('Elles nous permettent de **comprendre les relations entre les variables**, d’améliorer la performance et l’interprétabilité du modèle en réduisant le bruit et en se concentrant sur les variables les plus influentes.')
-  @st.cache_data(ttl=1200)
-  def heat_map():
-    df_Fires_ML_num = df.select_dtypes(include=[np.number])
-    plt.subplots(figsize = (7,7))
-    sns.set_style(style='white')
-    sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
-    df_Fires_ML_num = df.select_dtypes(include=[np.number])
-    mask = np.zeros_like(df_Fires_ML_num.corr(), dtype='bool')
-    mask[np.triu_indices_from(mask)] = True
-    fig7b, ax = plt.subplots(figsize = (10,7))
-    sns.heatmap(df_Fires_ML_num.corr(), cmap=sns.diverging_palette(20, 220, n=200), annot=True, center = 0, mask=mask, annot_kws={"size": 8})
-    plt.title("Heatmap of all the selected features of data set", fontsize = 15)
-    return fig7b
-  fig7b=heat_map()
-  fig7b 
+    elif subpage == subpages[1]:
+        st.subheader("2 - Répartition des feux par cause et classe")
+        with st.container():
+        col1, col2 = st.columns([0.6, 0.4],gap="small",vertical_alignment="center")
+        with col1 :
+        def plot_fire_cause_pie_charts(df):
+          Fires_cause = df.groupby("STAT_CAUSE_DESCR").agg({"FPA_ID": "count", "FIRE_SIZE": "sum"}).reset_index()
+          Fires_cause = Fires_cause.rename({"FPA_ID": "COUNT_FIRE", "FIRE_SIZE": "FIRE_SIZE_SUM"}, axis=1)
+          Indic = ["≈ Hawaii + Massachusetts", "≈ Hawaii + Massachusetts", "≈ Washington + Georgia", "≈ Maine", "≈ New Jersey + Massachusetts"]
+          Fires_cause["Text"] = Indic
+          fig = make_subplots(rows=1, cols=2, specs=[[{"type": "domain"}, {"type": "domain"}]])
+          fig.add_trace(go.Pie(labels=Fires_cause["STAT_CAUSE_DESCR"], values=Fires_cause["COUNT_FIRE"], hole=0.6,
+                               direction="clockwise", title=dict(text="Nombre", font=dict(size=20))), row=1, col=1)
+          fig.add_trace(go.Pie(labels=Fires_cause["STAT_CAUSE_DESCR"], values=Fires_cause["FIRE_SIZE_SUM"], hovertext=Fires_cause["Text"],
+                               hole=0.6, direction="clockwise", title=dict(text="Surfaces (acres)", font=dict(size=20))), row=1, col=2)
+          fig.update_traces(textfont_size=15, sort=False, marker=dict(colors=['#F1C40F', '#F39C12', '#e74c3c', '#E67E22', '#d35400']))
+          fig.update_layout(title_text="Répartition des feux par causes (1992 - 2015)", title_x=0.2, title_y=0.99, paper_bgcolor='rgba(0,0,0,0)',
+                            plot_bgcolor='rgba(0,0,0,0)', legend=dict(x=0.0, y=0.95, orientation="h", font=dict(family="Arial", size=12, color="black")),
+                            margin=dict(l=10, r=10, t=2, b=0), titlefont=dict(size=15), width=900, height=350)
+          return fig
+        fig = plot_fire_cause_pie_charts(df)
+        st.plotly_chart(fig)
+        #joblib.dump(st.plotly_chart(fig),"répartition_feux_acres")
+    
+        #Pie Chart répartition par cause
+        with col2 :
+        #if st.checkbox("Afficher graphiques par cause") :   
+          st.markdown(":orange[Les feux d’origine humaine] (volontaire et involontaire) représentent :orange[50% des départs].")
+          st.markdown(":orange[Les causes naturelles] (foudre) représentent :orange[62,1% des surfaces brûlées].")
+        with st.container():
+        col1, col2 = st.columns([0.6, 0.40],gap="small",vertical_alignment="center")
+        with col1 :
+        #with st.container(height=400):
+        def plot_fire_class_pie_charts(df):
+          Fires_class = df.groupby("FIRE_SIZE_CLASS").agg({"FPA_ID":"count", "FIRE_SIZE":"sum"}).reset_index()
+          Fires_class = Fires_class.rename({"FPA_ID":"COUNT_FIRE", "FIRE_SIZE":"FIRE_SIZE_SUM"}, axis = 1)
+          Indic = ["≈ ", "≈ ","≈ Connecticut", "≈ New Jersey", "≈ Maryland", "≈ Virginie Occidentale + Delaware", "≈ Californie + Hawaii"]
+          Fires_class["Text"] = Indic
+          fig1= make_subplots(rows = 1, cols = 2, specs = [[{"type":"domain"}, {"type":"domain"}]])
+          fig1.add_trace(go.Pie(labels = Fires_class["FIRE_SIZE_CLASS"],values = Fires_class["COUNT_FIRE"],
+               hole = 0.6, rotation = 0,title = dict(text = "Nombre", font=dict(size=20))),row = 1, col = 1)
+          fig1.add_trace(go.Pie(labels = Fires_class["FIRE_SIZE_CLASS"],values = Fires_class["FIRE_SIZE_SUM"],
+               hovertext = Fires_class["Text"],hole = 0.6, rotation = -120,title = dict(text = "Surfaces (acres)", font=dict(size=20))), row = 1, col = 2)
+          fig1.update_traces(textfont_size=15,sort=False,marker=dict(colors=['yellow','brown','#F1C40F', '#F39C12', '#e74c3c','#E67E22','#d35400']))
+          fig1.update_layout(title_text="Répartition des feux suivant leur taille (1992 - 2015)", title_x = 0.2, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
+          plot_bgcolor='rgba(0,0,0,0)',legend=dict(x=0.2, y=0.95,orientation="h",font=dict(
+                family="Arial",size=12,color="black")),margin=dict(l=10, r=10, t=2, b=0),titlefont=dict(size=15),width=900,height=350)
+          return fig
+        fig2 = plot_fire_class_pie_charts(df)
+        st.plotly_chart(fig2)
+        #joblib.dump(st.plotly_chart(fig1),"répartition_feux_nb")
+        with col2 :      
+          st.write(":orange[Les feux de petite taille (A et B, <9,9 acres)] représentent :orange[62 % du nombre de départs] mais seulement :orange[2% des surfaces brûlées].  :orange[78 % des surfaces brûlées sont liées aux feux de la classe G] (avec des feux allant de 5000 à 600 000 acres).")
+    
+    elif subpage == subpages[2]:
+        st.subheader("3 - Répartition temporelle des feux")   
+        st.write("Cet axe révèle assez clairement des périodes à risque sur les départs et la gravité des feux")
+      #Histogrammes année
+        st.write("**Variabilité annuelle**")
+        st.write("Certaines années semblent clairement plus propices aux départs de feux. Cela peut s’expliquer par les conditions météorologiques. On observe notamment que les années où les surfaces brûlées sont significativement supérieures à la moyenne cela est dû à la foudre")
+        df1=df.groupby(['STAT_CAUSE_DESCR', 'FIRE_YEAR']).agg({"FIRE_SIZE":"sum"}).reset_index()
+        df1bis=df.groupby(['STAT_CAUSE_DESCR', 'FIRE_YEAR']).agg({"FPA_ID":"count"}).reset_index()
+        col1, col2 = st.columns([0.5, 0.5],gap="small",vertical_alignment="center")  
+        with col1 :
+          @st.cache_data(ttl=1200)
+          def graph_annee():
+            fig2bis = px.area(df1, 'FIRE_YEAR' , "FIRE_SIZE", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")    
+            fig2bis.update_layout(xaxis_title="",yaxis_title="",title_text="Répartition des feux par année et cause (en acres)", title_x = 0.2, title_y = 0.99,paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',width=700, height=350,legend=dict(x=0, y=1,title=None,orientation="v",font=dict(
+                  family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=20, b=50),titlefont=dict(size=15))
+            return fig2bis
+          fig2bis=graph_annee()
+          fig2bis
 
-  st.write("En analysant ces données plus en détail, on peut mieux comprendre les facteurs qui contribuent aux feux. Ces données soulignent l’importance de la prévention des feux de foret d’origine humaine et de la gestion des risques naturels pour minimiser les dégâts causés par les feux de forêt.")
+        with col2 :
+          @st.cache_data(ttl=1200)
+          def graph_annee_nombre():
+            fig3bis = px.area(df1bis, 'FIRE_YEAR' , "FPA_ID", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")
+            fig3bis.update_layout(xaxis_title="",yaxis_title="",title_text="Répartition des feux par année et cause (en nombre)", title_x = 0.2, title_y = 0.99,paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',width=700, height=350,legend=dict(title=None,x=0, y=1,orientation="v",font=dict(
+                  family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=20, b=00),titlefont=dict(size=15))
+            return fig3bis
+          fig3bis=graph_annee_nombre()
+          fig3bis
+
+      #Histogrammes mois
+        st.write("**Périodes à risque**")
+        st.write("Les mois de juin à août sont les plus dévastateurs ce qui qui peut sous-entendre 2 facteurs : un climat plus favorable aux départs de feux, des activités humaines à risque plus élevées pendant les périodes de vacances")
+        #if st.checkbox("Afficher graphiques mois") :
+        @st.cache_data(ttl=1200)
+        def hist_mois_acres_nb():
+          fig3= make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("En surfaces brûlées (acres)","En Nombre de départs"))
+          fig3.add_trace(go.Histogram(histfunc="sum",
+            name="Surface brûlées (acres) ",
+            x=df['MONTH_DISCOVERY'],y=df['FIRE_SIZE'], marker_color='red'),1,1)
+          fig3.add_trace(go.Histogram(histfunc="count",
+            name="Nombre de feux",
+            x=df['MONTH_DISCOVERY'],marker_color='blue'),1,2)
+          fig3.update_layout(title_text="Départs de feux par mois",bargap=0.2,height=400, width=1100, coloraxis=dict(colorscale='Bluered_r'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
+          plot_bgcolor='rgba(0,0,0,0)')
+          return fig3
+        fig3=hist_mois_acres_nb()
+        fig3
+
+      #Histogrammes jour semaine
+        st.write("**Corrélation avec les feux d’origine humaine**")   
+        st.write("On observe également des départs de feux significativement plus élevés le week-end. Ce qui peut être mis en corrélation avec les feux d'origine humaine déclenchés par des activités à risque plus propices en périodes de week-end (feux de camps...)")
+        #if st.checkbox("Afficher graphiques jour de la semaine") :
+        @st.cache_data(ttl=1200)
+        def hist_jours_acres_nb():
+          df['DAY_OF_WEEK_DISCOVERYName'] = pd.to_datetime(df['DISCOVERY_DATE']).dt.day_name()
+          Fires2=df.loc[df['STAT_CAUSE_DESCR']!="Foudre"]
+          Fires3 = Fires2.groupby('DAY_OF_WEEK_DISCOVERYName')['FPA_ID'].value_counts().groupby('DAY_OF_WEEK_DISCOVERYName').sum()
+          week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+          Fires3 = Fires3.reindex(week)
+          Fires4 = Fires2.groupby('DAY_OF_WEEK_DISCOVERYName')['FIRE_SIZE'].sum()
+          week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+          Fires4 = Fires4.reindex(week)
+          fig4 = make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("En surfaces brûlées (acres)","En Nombre de départs"))
+          fig4.add_trace(go.Histogram(histfunc="sum",
+            name="Surface brûlées (acres) ",
+            x=Fires4.index,y=Fires4.values, marker_color='red'),1,1)
+          fig4.add_trace(go.Histogram(histfunc="sum",
+            name="Nombre de feux",
+            x=Fires3.index,y=Fires3.values,marker_color='blue'),1,2)
+          fig4.update_layout(title_text="Départs de feux en fonction du jour de la semaine",bargap=0.2,height=400, width=1000, coloraxis=dict(colorscale='Bluered_r'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
+          plot_bgcolor='rgba(0,0,0,0)')
+          return fig4
+        fig4=hist_jours_acres_nb()
+        fig4
+
+        df3=df.groupby(['STAT_CAUSE_DESCR', 'DISCOVERY_DOY']).agg({"FIRE_SIZE":"sum"}).reset_index()
+
+        @st.cache_data(ttl=1200)
+        def jour_cause(): 
+          fig4bis = px.area(df3, 'DISCOVERY_DOY' , "FIRE_SIZE", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")
+          fig4bis.update_layout(title_text="Répartition des feux jours de l'année et cause (en acres)", title_x = 0.3, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
+          plot_bgcolor='rgba(0,0,0,0)',width=1000, height=400,legend=dict(title=None,x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+                  family="Arial",size=15,color="black")),margin=dict(l=100, r=100, t=25, b=50),titlefont=dict(size=20))
+          return fig4bis
+        fig4bis=jour_cause()
+        fig4bis
+
+      # Durée moyenne
+        st.write('L’analyse de la durée des feux par cause montre une certaine hétérogénéité de la durée des feux en fonction de la cause. Les feux liés à la foudre sont en moyenne deux fois plus longs à contenir que les autres types de feux')
+        st.write("La Foudre : Les feux déclenchés par la foudre sont souvent situés dans des zones difficiles d’accès, ce qui complique les efforts de lutte contre les incendies. De plus, ces feux peuvent se propager rapidement en raison des conditions météorologiques associées aux orages, comme les vents forts.")
+        #if st.checkbox("Afficher graphiques par durée") :
+        @st.cache_data(ttl=1200)
+        def durée(): 
+          Fires_burn = df.dropna(subset=['CONT_DOY', 'DISCOVERY_DOY']).copy()
+          Fires_burn['CONT_DOY'] = Fires_burn['CONT_DOY'].astype(int)
+          Fires_burn['DISCOVERY_DOY'] = Fires_burn['DISCOVERY_DOY'].astype(int)
+          Fires_burn['BURN_TIME'] = Fires_burn['CONT_DOY'] - Fires_burn['DISCOVERY_DOY']
+          Fires_burn.loc[Fires_burn['BURN_TIME'] < 0, 'BURN_TIME'] += 365
+          cause_avg_burn_time = Fires_burn.groupby('STAT_CAUSE_DESCR', dropna=True)['BURN_TIME'].mean().reset_index()
+          cause_avg_burn_time.sort_values(by='BURN_TIME', ascending=False, inplace=True)
+          fig5 = px.bar(
+          cause_avg_burn_time,
+            x='BURN_TIME',
+            y='STAT_CAUSE_DESCR',
+            labels={"STAT_CAUSE_DESCR": "Cause", "BURN_TIME": "Durée moyenne (jours)"},
+            title='Durée moyenne des feux par cause',
+            orientation='h',  # Horizontal orientation
+            color='STAT_CAUSE_DESCR',
+            color_discrete_sequence=px.colors.sequential.Reds_r)
+          fig5.update_layout(xaxis=dict(tickmode='linear', dtick=0.5),title_x = 0.3, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
+          plot_bgcolor='rgba(0,0,0,0)',width=1000, height=400,showlegend=False,margin=dict(l=170, r=200, t=50, b=50),titlefont=dict(size=20))
+          return fig5
+        fig5=durée()
+        fig5
+
+        @st.cache_data(ttl=1200)
+        def load_FiresClasse():
+          Fires_bis = df
+          modif1 = ["Campfire", "Debris Burning", "Smoking", "Fireworks", "Children"]
+          modif2 = ["Powerline", "Railroad", "Structure", "Equipment Use"]
+          Fires_bis["STAT_CAUSE_DESCR"] = Fires_bis["STAT_CAUSE_DESCR"].replace("Missing/Undefined", "Miscellaneous")
+          Fires_bis["STAT_CAUSE_DESCR"] = Fires_bis["STAT_CAUSE_DESCR"].replace(modif1, "Origine humaine")
+          Fires_bis["STAT_CAUSE_DESCR"] = Fires_bis["STAT_CAUSE_DESCR"].replace(modif2, "Equipnt Infrastr")
+          Fires_bis["FIRE_SIZE_CLASS"] = Fires_bis["FIRE_SIZE_CLASS"].replace(["A", "B", "C"], "ABC")
+          Fires_bis["FIRE_SIZE_CLASS"] = Fires_bis["FIRE_SIZE_CLASS"].replace(["D", "E", "F"], "DEF")
+          FiresClasse = df[(Fires_bis['FIRE_SIZE_CLASS'] != "ABC")&(df['FIRE_SIZE_CLASS'] != "B")&(df['FIRE_SIZE_CLASS'] != "C")&(df['FIRE_SIZE_CLASS'] != "D")]
+          FiresClasse = df[(Fires_bis['FIRE_SIZE_CLASS'] != "ABC")]
+          return FiresClasse
+        FiresClasse=load_FiresClasse()
+
+    elif subpage == subpages[3]:
+        st.subheader("4 - Répartition géographique")
+        st.markdown("On observe une densité plus élevée de surfaces brûlées à l’ouest des États-Unis, ce qui pourrait être attribué à divers facteurs tels que le climat, la végétation et les activités humaines.")
+        st.markdown("**Facteurs Climatiques**- périodes de sécheresse prolongées")
+        st.markdown("**Végétations**- type de végétation vulnérables aux feux et contribule à la propagation des feux")
+        st.markdown("**Activités humaines**- l’urbanisation croissante dans les zones à risque, les pratiques agricoles, et les loisirs en plein air augmentent la probabilité de départs de feux")
+
+        @st.cache_data(ttl=1200)
+        def plot_fire_geo_scatter(FiresClasse):
+          fig6 = px.scatter_geo(
+            FiresClasse,
+            lon=FiresClasse['LONGITUDE'],
+            lat=FiresClasse['LATITUDE'],
+            color="STAT_CAUSE_DESCR",
+            #facet_col="FIRE_YEAR", # Uncomment to create a graph per year
+            #facet_col_wrap, # Uncomment to define the number of graphs per row
+            #animation_frame="FIRE_YEAR", # Uncomment to create an animation over the years
+            color_discrete_sequence=["blue", "orange", "red", "grey", "purple"],
+            labels={"STAT_CAUSE_DESCR": "Cause"},
+            hover_name="STATE", # Column added to hover information
+            size=FiresClasse['FIRE_SIZE'] / 1000, # Size of markers
+            projection='albers usa',
+            locationmode='USA-states',
+            width=800,
+            height=500,
+            title="Répartition géographique des feux par cause et taille",
+            basemap_visible=True
+            )
+          fig6.update_geos(
+            resolution=50,
+            lataxis_showgrid=True,
+            lonaxis_showgrid=True,
+            bgcolor='rgba(0,0,0,0)',
+            framecolor='blue',
+            showframe=True,
+            showland=True,
+            landcolor='#e0efe7',
+            projection_type="albers usa"
+            )
+          fig6.update_layout(
+            title_text="Répartition géographique des feux par cause et taille",
+            title_x=0.3,
+            title_y=0.95,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            width=1000,
+            height=500,
+            legend=dict(
+              x=0.5,
+              y=1.05,
+              orientation="h",
+              xanchor="center",
+              yanchor="bottom",
+              font=dict(
+                family="Arial",
+                size=15,
+                color="black"
+                )
+            ),
+            margin=dict(l=50, r=50, t=100, b=50),
+            titlefont=dict(size=20)
+            )
+          return fig6
+        fig6 = plot_fire_geo_scatter(FiresClasse)
+        st.plotly_chart(fig6)
+        gc.collect()
+
+        #if st.checkbox("Afficher graphiques répartition géographique et année") :
+        col1, col2 = st.columns(2)
+
+        with col1:
+          @st.cache_data(persist=True)
+          def scatter_geo_global():
+            fig7 = px.scatter_geo(FiresClasse,
+              lon = FiresClasse['LONGITUDE'],
+              lat = FiresClasse['LATITUDE'],
+              color="STAT_CAUSE_DESCR",
+              #facet_col="FIRE_YEAR", #pour créer un graph par année
+              #facet_col_wrap,# pour définir le nombre de graph par ligne
+              #animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
+              color_discrete_sequence=["blue","orange","red","grey","purple"],
+              labels={"STAT_CAUSE_DESCR": "Cause"},
+              hover_name="STATE", # column added to hover information
+              size=FiresClasse['FIRE_SIZE']/1000, # size of markers
+              projection='albers usa',
+              width=800,
+              height=500,
+              title="Répartition géographique des feux par cause, taille",basemap_visible=True)
+          fig7.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
+          fig7.update_layout(title_text="Répartition géographique des feux par cause et taille", title_x = 0.1, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
+          plot_bgcolor='rgba(0,0,0,0)',width=1000, height=700,legend=dict(title=None,x=0.5, y=0.85,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+                family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=50, b=290),titlefont=dict(size=18))   
+          return fig7
+        fig7=scatter_geo_global()
+        fig7
+        gc.collect()
+        #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
+
+        with col2:
+          @st.cache_data(persist=True)
+          def scatter_geo():
+            fig7_ = px.scatter_geo(FiresClasse,
+                lon = FiresClasse['LONGITUDE'],
+                lat = FiresClasse['LATITUDE'],
+                color="STAT_CAUSE_DESCR",
+                #facet_col="FIRE_YEAR", #pour créer un graph par année
+                #facet_col_wrap,# pour définir le nombre de graph par ligne
+                animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
+                color_discrete_sequence=["blue","orange","red","grey","purple"],
+                labels={"STAT_CAUSE_DESCR": "Cause"},
+                hover_name="STATE", # column added to hover information
+                size=FiresClasse['FIRE_SIZE']/1000, # size of markers
+                projection='albers usa',
+                width=800,
+                height=500,
+                title="Focus par année",basemap_visible=True)
+            fig7_.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
+            fig7_.update_layout(title_text="Focus par année", title_x = 0.4, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',width=1000, height=500,legend=dict(title=None,x=0.5, y=0.95,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+                  family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=100, b=50),titlefont=dict(size=18))   
+            return fig7_
+          fig7_=scatter_geo()
+          fig7_
+          gc.collect()
+          #joblib.dump(st.plotly_chart(fig7_),"répartition_géo_mois")
+
+    elif subpage == subpages[3]:
+        st.subheader("5 - Analyse corrélations entre variables")       
+        # Plot heatmap - correlation matrix for all numerical columns
+        #style.use('ggplot')
+        #if st.checkbox("Afficher heatmap") :
+        st.write('Cette matrice permet d’identifier quelles variables ont de fortes corrélations entre elles, ce qui nous aide à **sélectionner les caractéristiques les plus pertinentes** pour notre modèle de Machine Learning.')
+        st.write('Elles nous permettent de **comprendre les relations entre les variables**, d’améliorer la performance et l’interprétabilité du modèle en réduisant le bruit et en se concentrant sur les variables les plus influentes.')
+        
+        @st.cache_data(ttl=1200)
+        def heat_map():
+          df_Fires_ML_num = df.select_dtypes(include=[np.number])
+          plt.subplots(figsize = (7,7))
+          sns.set_style(style='white')
+          sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
+          df_Fires_ML_num = df.select_dtypes(include=[np.number])
+          mask = np.zeros_like(df_Fires_ML_num.corr(), dtype='bool')
+          mask[np.triu_indices_from(mask)] = True
+          fig7b, ax = plt.subplots(figsize = (10,7))
+          sns.heatmap(df_Fires_ML_num.corr(), cmap=sns.diverging_palette(20, 220, n=200), annot=True, center = 0, mask=mask, annot_kws={"size": 8})
+          plt.title("Heatmap of all the selected features of data set", fontsize = 15)
+          return fig7b
+        fig7b=heat_map()
+        fig7b 
+        gc.collect()
+        st.write("En analysant ces données plus en détail, on peut mieux comprendre les facteurs qui contribuent aux feux. Ces données soulignent l’importance de la prévention des feux de foret d’origine humaine et de la gestion des risques naturels pour minimiser les dégâts causés par les feux de forêt.")
   
 # Modèles de prédiction des causes
 if page == pages[3] : 
@@ -553,6 +577,7 @@ if page == pages[3] :
   # Sauvegarde des 200 dernières lignes du jeu pour la validation finale et l'interactivité
   Fires_test2 = Fires_ML.iloc[-200:, :]
   Fires_ML = Fires_ML.iloc[:-200, :]
+  gc.collect()
 
   st.subheader("Regroupement des causes 🗂️", divider="blue") 
   if st.checkbox("Cliquez pour voir les causes de feux"):
@@ -576,6 +601,7 @@ if page == pages[3] :
                   Compte tenu de leur caractère inerte par rapport à l'objectif de l'étude, nous les supprimerons.
                   Pour les diverses qui peuvent se ressembler, nous procéderons à leur regroupement dans une cause parente
                   </div>""", unsafe_allow_html=True)
+      gc.collect()
     with col2:
       st.write("#### Distribution des causes après regroupement")
       count2 = Fires_ML["STAT_CAUSE_CODE"].value_counts()
@@ -597,6 +623,7 @@ if page == pages[3] :
                - **:red[Criminelle] (1)** : Arson"
                - **:orange[Naturelle] (2)** : Ligthning
                """)
+      gc.collect()
 
   ######################################################################################################################################################################
   ### Fonctions de preprocessing du jeu de données pour le ML ##########################################################################################################
@@ -626,6 +653,7 @@ if page == pages[3] :
     # display(feats.shape, X_train.shape, X_test.shape)
     return X_train, X_test, y_train, y_test
   X_train, X_test, y_train, y_test = data_split(feats, target)
+  gc.collect()
 
 
   # Traitement des variables cycliques
@@ -648,7 +676,8 @@ if page == pages[3] :
     return circular_data
   circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
   gc.collect()
-  # TRaitement des variables numériques
+
+  # Traitement des variables numériques
   @st.cache_data(ttl=1200)
   def num_imputer(X):
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
@@ -669,8 +698,9 @@ if page == pages[3] :
     X_num["DURATION"] = num_data["DURATION"]
     X_num = X_num.reset_index(drop = True)
     return X_num
+  gc.collect()
   num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
-  #gc.collect()
+  gc.collect()
   # Reconstitution du jeu de données après traitement
   @st.cache_data(ttl=1200)
   def X_concat(X_train_num, X_test_num, circular_train, circular_test):
@@ -683,7 +713,7 @@ if page == pages[3] :
     overall_col = X_train_final.columns
     return X_train_final, X_test_final, overall_col
   X_train_final, X_test_final, overall_col = X_concat(num_train_imputed, num_test_imputed, circular_train, circular_test)
-
+  gc.collect()
 
   # Réduction du modèle avec la méthode feature importances
   @st.cache_resource
@@ -765,6 +795,7 @@ if page == pages[3] :
       model = joblib.load("best_xgb_raw_model.joblib")
       return model
   gc.collect()
+
   # Best xgb raw model
   @st.cache_resource
   def best_rf_raw_model(X, y):
@@ -778,6 +809,7 @@ if page == pages[3] :
      model = joblib.load("best_rf_raw_model.joblib")
      return model
   gc.collect()
+
   # Best LogReg raw model
   @st.cache_resource
   def best_LogReg_raw_model(X, y):
@@ -789,6 +821,7 @@ if page == pages[3] :
      model = joblib.load("best_lr_raw_model.joblib")
      return model
   gc.collect()
+
   # Best Decision Tree raw model
   @st.cache_resource
   def best_DecTree_raw_model(X, y):
@@ -858,6 +891,7 @@ if page == pages[3] :
     else:
       X_train_final, X_test_final = X_train_final, X_test_final
       st.write("Les variables ne sont pas réduites")
+  gc.collect()
     
     # Définition des paramètres des modèles sur l'interface streamlit
     ####################################
@@ -877,6 +911,7 @@ if page == pages[3] :
       tree_method = st.sidebar.radio("Veuillez choisir la méthode", ("approx", "hist"), horizontal=True)
       max_depth = st.sidebar.slider("Veuillez choisir la profondeur de l'arbre", 3, 20, 5)
       learning_rate = st.sidebar.slider("Veuillez choisir le learning rate", 0.05, 0.25, 0.1, 0.05)
+    gc.collect() 
     ####################################
     ###     Modèle Random Forest     ###
     ####################################
@@ -894,6 +929,7 @@ if page == pages[3] :
       min_samples_leaf = st.sidebar.slider("Veuillez choisir min_samples_leaf", 20, 60, 40, 5)
       min_samples_split = st.sidebar.slider("Veuillez choisir min_samples_split", 30, 100, 100, 5)      
       max_features = st.sidebar.radio("Veuillez choisir le nombre de features", ("sqrt", "log2"), horizontal=True)
+    gc.collect()
     ####################################
     ### Modèle Regression Logistique ###
     ####################################
@@ -905,6 +941,7 @@ if page == pages[3] :
          classes_weights = None
       max_iter = st.sidebar.slider("Veuillez choisir le nombre d'itérations", 100, 2000, 1000, 50)
       solver = st.sidebar.radio("Veuillez choisir le solveur", ("lbfgs", "newton-cg", "sag", "saga"), horizontal=True)
+    gc.collect()
     ####################################
     ###   Modèle Arbre de Décision   ###
     ####################################
@@ -919,7 +956,7 @@ if page == pages[3] :
       max_depth = st.sidebar.slider("Veuillez choisir la profondeur de l'arbre", 10, 200, 10, 10)
       min_samples_split = st.sidebar.slider("Veuillez choisir la profondeur de l'arbre", 10, 50, 20, 5)
       min_samples_leaf = st.sidebar.slider("Veuillez choisir la profondeur de l'arbre", 10, 100, 50, 5)
-
+    gc.collect()
 
     # Création d'un bouton pour le modèle avec les meilleurs paramètres
     if st.sidebar.button("Best Model Execution"):
@@ -938,6 +975,8 @@ if page == pages[3] :
         joblib.dump(clf_xgb_best, "clf_xgb_best_model.joblib")
         # Chargement du meilleur modèle
         model = joblib.load("clf_xgb_best_model.joblib")
+        gc.collect()
+
       elif classifier == "Random Forest":
         st.subheader("Random Forest Result")
         best_params = {"n_estimators": 50,
@@ -951,6 +990,8 @@ if page == pages[3] :
         joblib.dump(clf_rf_best, "clf_rf_best_model.joblib")
         # Chargement du meilleur modèle
         model = joblib.load("clf_rf_best_model.joblib")
+        gc.collect()
+
       elif classifier == "Regression Logistique":
         st.subheader("Logistic Regression Result")
         best_params = {"max_iter":1000,
@@ -961,6 +1002,8 @@ if page == pages[3] :
         clf_LogReg_best = LogisticRegression(**best_params, class_weight = "balanced", random_state = 42).fit(X_train_final, y_train)
         joblib.dump(clf_LogReg_best, "clf_LogReg_best_model.joblib")
         model = joblib.load("clf_LogReg_best_model.joblib")
+        gc.collect()
+
       elif classifier == "Arbre de Décision":
         st.subheader("Decision Tree Result")
         best_params = {"criterion":"gini"}
@@ -975,6 +1018,7 @@ if page == pages[3] :
       recall = np.diag(cm) / np.sum(cm, axis = 1)
       st.write("Test Accuracy", round(accuracy, 4))
       st.write("Test Recall", round(np.mean(recall), 4))
+      gc.collect()
       
       # Tracé des graphes (Feature Importances, Matrice de confusion, Precision-Recall)
       col1, col2, col3 = st.columns(3, gap="small", vertical_alignment="center") #
@@ -986,7 +1030,8 @@ if page == pages[3] :
               'plot_bgcolor': 'rgba(0, 0, 0, 0)',
               'paper_bgcolor': 'rgba(0, 0, 0, 0)'
           })
-              st.plotly_chart(fig)   
+              st.plotly_chart(fig)
+              gc.collect()   
             
       with col2:
           with st.container():
@@ -996,6 +1041,7 @@ if page == pages[3] :
                   x=0.5, y=1.05, orientation="h", xanchor="center", yanchor="bottom", font=dict(family="Arial", size=15, color="black")),
                 margin=dict(l=100, r=100, t=100, b=100), titlefont=dict(size=20))
               st.plotly_chart(figML)
+              gc.collect()
 
       with col1:
           with st.container():
@@ -1018,6 +1064,7 @@ if page == pages[3] :
                                 margin=dict(l=100, r=100, t=100, b=100),
                                 titlefont=dict(size=15))
               st.plotly_chart(fig)
+              gc.collect()
 
     # Création d'un bouton utilisateur pour l'interactivité
     if st.sidebar.button("User Execution", key = "classify"):
@@ -1050,6 +1097,7 @@ if page == pages[3] :
                                         min_samples_split = min_samples_split,
                                         min_samples_leaf = min_samples_leaf,
                                         class_weight = classes_weights).fit(X_train_final, y_train)
+      gc.collect()
       # st.write("Le score d'entrainement est :", np.round(model.score(X_train_final, y_train), 4))
       y_pred = model.predict(X_test_final)
       cm = np.round(confusion_matrix(y_test, y_pred, normalize = "true"), 4)
@@ -1068,7 +1116,8 @@ if page == pages[3] :
               'plot_bgcolor': 'rgba(0, 0, 0, 0)',
               'paper_bgcolor': 'rgba(0, 0, 0, 0)'
           })
-              st.plotly_chart(fig)   
+              st.plotly_chart(fig)
+              gc.collect()
             
       with col1:
           with st.container():
@@ -1079,7 +1128,7 @@ if page == pages[3] :
                   x=0.5, y=1.05, orientation="h", xanchor="center", yanchor="bottom", font=dict(family="Arial", size=15, color="black")),
                 margin=dict(l=100, r=100, t=100, b=100), titlefont=dict(size=20))
               st.plotly_chart(figML)
-
+              gc.collect()
 
   #############################################################################
   ### Déploiement en production (prédiction basée sur de nouvelles données) ###
@@ -1130,6 +1179,7 @@ if page == pages[3] :
       y_pred.loc[y_pred["FIRE CAUSE"] == 1, "FIRE CAUSE"] = "Criminelle 🦹🏻‍♂️🔥"
       y_pred.loc[y_pred["FIRE CAUSE"] == 2, "FIRE CAUSE"] = "Naturelle 🌩️"
       st.dataframe(y_pred)
+      gc.collect()
 
 # Modèles de prédiction des classes
 if page == pages[4] :  
@@ -1140,17 +1190,21 @@ if page == pages[4] :
   FiresML2['FIRE_SIZE_CLASS'] = FiresML2['FIRE_SIZE_CLASS'].replace({"A":0,"B":0,"C":0,"D":1,"E":1,"F":1,"G":1})
   FiresML2=FiresML2.dropna() 
   return FiresML2
+ gc.collect()
  FiresML2=load_FiresML2()
+
  @st.cache_data(ttl=1200)
  def feats_target():
    feats = FiresML2.drop('FIRE_SIZE_CLASS', axis=1)
    target = FiresML2['FIRE_SIZE_CLASS'].astype('int')
    return feats, target
  feats,target=feats_target()
+ gc.collect()
+
  @st.cache_data(ttl=1200)
  def data_split(X, y):
   X_train, X_test, y_train, y_test = train_test_split(feats, target, test_size=0.25, random_state = 42,stratify=target)
-  return X_train, X_test, y_train, y_test
+  return X_train, X_test, y_train, y_test 
  X_train, X_test, y_train, y_test = data_split(feats, target)
  num_train=X_train.drop(['STAT_CAUSE_DESCR','MONTH_DISCOVERY'],axis=1)
  num_test=X_test.drop(['STAT_CAUSE_DESCR','MONTH_DISCOVERY'],axis=1)
@@ -1162,6 +1216,8 @@ if page == pages[4] :
  cat_test=X_test.drop(['AVG_TEMP [°C]','AVG_PCP [mm]','MONTH_DISCOVERY','LONGITUDE','LATITUDE'],axis=1)
  cat_train=oneh.fit_transform(cat_train)
  cat_test= oneh.transform(cat_test)
+ gc.collect()
+
  @st.cache_data(ttl=1200)
  def label_circ(X_train, X_test):
    circular_cols = ['MONTH_DISCOVERY']
@@ -1173,12 +1229,16 @@ if page == pages[4] :
    circular_test['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
    return circular_train,circular_test
  circular_train,circular_test=label_circ(X_train,X_test)
+ gc.collect()
+
  @st.cache_data(ttl=1200)
  def X_train_X_test(X_train, X_test):
    X_train=np.concatenate((num_train,cat_train,circular_train),axis=1)
    X_test=np.concatenate((num_test,cat_test,circular_test), axis=1)
    return X_train,X_test
  X_train,X_test=X_train_X_test(X_train, X_test)
+ gc.collect()
+
  @st.cache_data(ttl=1200)
  def y_train_ytest(y_train,y_test):
    le = LabelEncoder()
@@ -1187,7 +1247,11 @@ if page == pages[4] :
    return y_train,y_test
  y_train,y_test=y_train_ytest(y_train,y_test)
  st.subheader("Objectif", divider="blue") 
- st.markdown("L'objectif du modèle est de définir la probabilité qu'un feu se transorme en feu de grande classe. Les classes ont été regroupées de la façon suivante : la classe 0 (petite classe) regroupe les feux de classes A à C (0 à 100 acres), la classe 1 (grande classe) regroupe les feux des classes D à G (100 à plus de 5000 acres).")  
+ st.markdown("L'objectif du modèle est de définir la probabilité qu'un feu se transorme en feu de grande classe.
+              Les classes ont été regroupées de la façon suivante : la classe 0 (petite classe) regroupe les feux de classes A à C (0 à 100 acres),
+              la classe 1 (grande classe) regroupe les feux des classes D à G (100 à plus de 5000 acres).")
+ gc.collect()
+
  #if st.checkbox("Affichage répartition des classes") :
  with st.container():
    #@st.cache_data(persist=True)
@@ -1206,6 +1270,8 @@ if page == pages[4] :
    #fig30=Rep_Class()
    #fig30
  joblib.dump(st.plotly_chart(fig30),"Répartition Classe")
+ gc.collect()
+
  with st.sidebar :  
   with st.form(key='my_form2'):
    st.header("1 - Choix du modèle")
@@ -1233,6 +1299,7 @@ if page == pages[4] :
   df_fires_encoded=np.concatenate((num_input_fires,cat_input_fires,circular_input_fires),axis=1)
   LAT=input_df[:1].LATITUDE.to_numpy()
   LONG=input_df[:1].LONGITUDE.to_numpy()
+  gc.collect()
  #classifier=st.selectbox("Sélection du modèle",("BalancedRandomForest","XGBoost"))
  #with st.form(key='my_form'):
   #submit_button = st.form_submit_button(label='Submit')
@@ -1246,6 +1313,7 @@ if page == pages[4] :
   df_prediction_proba.columns=['Petite Classe','Grande Classe']
   df_prediction_proba.rename(columns={0:"Petite Classe",1:"Grande Classe"})
   Fires_class_pred=np.array(['Petite Classe','Grande Classe'])
+  gc.collect()
  #classifier=st.selectbox("Sélection du modèle",("XGBoost","BalancedRandomForest"))
  #if classifier == "XGBoost":
   #model = joblib.load("model.joblib")
@@ -1278,6 +1346,8 @@ if page == pages[4] :
      return figML2
     figML2=AUC()
     figML2
+    gc.collect()
+
   with col2:
    with st.container(height=350):
     @st.cache_data(persist=True)
@@ -1290,6 +1360,8 @@ if page == pages[4] :
      return figML1
     figML1=cm()
     figML1 
+    gc.collect()
+
    with col1 : 
     with st.container(height=350):
      feats1 = {}
@@ -1301,6 +1373,8 @@ if page == pages[4] :
      fig.update_layout(title='Features Importance',title_x = 0.4, title_y = 0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
      family="Arial",size=15,color="black")),margin=dict(l=0, r=0, t=50, b=0),titlefont=dict(size=15))
      st.plotly_chart(fig) 
+     gc.collect()
+
   st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue") 
 #  col1, col2 = st.columns([0.55,0.45],gap="small",vertical_alignment="center")
 #  with col1 :
@@ -1348,6 +1422,8 @@ if page == pages[4] :
   st.subheader("Importance features et performance du modèle Balanced Random Forest", divider="blue")
   st.write("Accuracy",round(model3.score(X_test,y_test),4))
   st.write("Recall",round(recall_score(y_test,y_pred),4))
+  gc.collect()
+
   col1, col2,col3 = st.columns(3,gap="small",vertical_alignment="center")
   with col3:
    with st.container(height=350):
@@ -1364,6 +1440,8 @@ if page == pages[4] :
          return figML2
         figML2=ROCAUC()
         figML2
+        gc.collect()
+
    with col2:
     with st.container(height=350):
      @st.cache_data(persist=True, ttl=1200)
@@ -1379,6 +1457,8 @@ if page == pages[4] :
       return figML1
      figML1=MatriceConfusion()
      figML1
+     gc.collect()
+
    with col1 : 
     with st.container(height=350):
      @st.cache_data(persist=True, ttl=1200)
@@ -1394,6 +1474,8 @@ if page == pages[4] :
         return figML3
      figML3=FeatureImportance()
      figML3
+     gc.collect()
+
   st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue")
   col1, col2 = st.columns([0.55,0.45],gap="small",vertical_alignment="center")
   with col1 :
@@ -1411,6 +1493,8 @@ if page == pages[4] :
            attr="Sources: National Geographic, Esri, Garmin, HERE, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, INCREMENT P")  
      folium.Marker([LAT, LONG],popup=popup2,icon=folium.Icon(color=color, icon='fire', prefix='fa')).add_to(m)
      st_data = st_folium(m,width=800,returned_objects=[])
+     gc.collect()
+
   with col2 :
     st.info('Cliquer sur le point localisé sur la carte pour afficher les probabilités de chaque classe',icon="ℹ️",)
     st.markdown("")
@@ -1428,7 +1512,6 @@ if page == pages[4] :
 
 # Conclusion
 if page == pages[5] : 
-  #  st.write("### Conclusion")
   st.write("### Conclusion et propositions d’optimisation")
   st.markdown("""
 Le projet “Feux de forêts” nous a permis de mettre en pratique les compétences acquises durant notre formation en data analysis, en abordant toutes les étapes d’un projet de Data Science, de l’exploration des données à la modélisation et la data visualisation. Nous avons également abordé les étapes de prédiction, en utilisant des modèles avancés pour prévoir les occurrences de feux de forêts et ainsi mieux comprendre les facteurs qui les influencent.
