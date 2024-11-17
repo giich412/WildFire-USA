@@ -1302,36 +1302,36 @@ if page == pages[4] :
      family="Arial",size=15,color="black")),margin=dict(l=0, r=0, t=50, b=0),titlefont=dict(size=15))
      st.plotly_chart(fig) 
   st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue") 
-  col1, col2 = st.columns([0.55,0.45],gap="small",vertical_alignment="center")
-  with col1 :
-   with st.container(height=350):
-    for i in range(0,len(Fires_class_pred)):    
-     if Fires_class_pred[prediction][0] == 'Petite Classe':
-      color = 'darkblue'
-     elif Fires_class_pred[prediction][0] == 'Grande Classe':
-      color = 'red'
-     else:
-      color = 'gray' 
-     html = df_prediction_proba.to_html(classes="table table-striped table-hover table-condensed table-responsive")
-     popup2 = folium.Popup(html)
-     m = folium.Map(location=[30, -65.844032],zoom_start=3,tiles='http://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
-           attr="Sources: National Geographic, Esri, Garmin, HERE, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, INCREMENT P")  
-     folium.Marker([LAT, LONG],popup=popup2,icon=folium.Icon(color=color, icon='fire', prefix='fa')).add_to(m)
-    st_data = st_folium(m,width=800,returned_objects=[])
-  with col2 :
-   st.info('Cliquer sur le point localisé sur la carte pour afficher les probabilités de chaque classe',icon="ℹ️",)
-   st.markdown("")
-   st.markdown("Légende :")
-   col1, col2 = st.columns([0.15,0.85],gap="small",vertical_alignment="center")
-   with col1:
-    st.image("feu_bleu.jpg",width=40)
-   with col2:
-    st.markdown(":blue[Probabilité classe 1 < 50%]")
-   col1, col2 = st.columns([0.15,0.85],gap="small",vertical_alignment="center")
-   with col1:
-    st.image("feu_rouge.jpg",width=40)
-   with col2:
-    st.markdown(":red[Probabilité classe 1 > 50%]")
+#  col1, col2 = st.columns([0.55,0.45],gap="small",vertical_alignment="center")
+#  with col1 :
+#   with st.container(height=350):
+#    for i in range(0,len(Fires_class_pred)):    
+#     if Fires_class_pred[prediction][0] == 'Petite Classe':
+#      color = 'darkblue'
+#     elif Fires_class_pred[prediction][0] == 'Grande Classe':
+#      color = 'red'
+#     else:
+#      color = 'gray' 
+#     html = df_prediction_proba.to_html(classes="table table-striped table-hover table-condensed table-responsive")
+#     popup2 = folium.Popup(html)
+#     m = folium.Map(location=[30, -65.844032],zoom_start=3,tiles='http://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
+#           attr="Sources: National Geographic, Esri, Garmin, HERE, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, INCREMENT P")  
+#     folium.Marker([LAT, LONG],popup=popup2,icon=folium.Icon(color=color, icon='fire', prefix='fa')).add_to(m)
+#    st_data = st_folium(m,width=800,returned_objects=[])
+#  with col2 :
+#   st.info('Cliquer sur le point localisé sur la carte pour afficher les probabilités de chaque classe',icon="ℹ️",)
+#   st.markdown("")
+#   st.markdown("Légende :")
+#  col1, col2 = st.columns([0.15,0.85],gap="small",vertical_alignment="center")
+#   with col1:
+#   st.image("feu_bleu.jpg",width=40)
+#   with col2:
+#    st.markdown(":blue[Probabilité classe 1 < 50%]")
+#   col1, col2 = st.columns([0.15,0.85],gap="small",vertical_alignment="center")
+#   with col1:
+#    st.image("feu_rouge.jpg",width=40)
+#   with col2:
+#    st.markdown(":red[Probabilité classe 1 > 50%]")
  
  if classifier == "BalancedRandomForest":
    #dict_weights = {0:1, 1: 1.2933}
