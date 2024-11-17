@@ -500,7 +500,7 @@ gc.collect()  # Call garbage collection here
   #    return fig7_
   #  fig7_=scatter_geo()
   #  fig7_
-  gc.collect()  # Call garbage collection here
+gc.collect()  # Call garbage collection here
     #joblib.dump(st.plotly_chart(fig7_),"répartition_géo_mois")
          
      
