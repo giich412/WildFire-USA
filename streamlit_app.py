@@ -604,7 +604,7 @@ if page == pages[3] :
 
   # Séparation des variables du target
   Fires_ML = Fires_ML.drop("STAT_CAUSE_DESCR_1", axis = 1)
-  @st.cache_data(persist="True")
+  @st.cache_data(persist=True)
   def data_labeling(data):
     # Remplacement des jours de la semaine par 1 à 7 au lieu de 0 à 6
     data["DAY_OF_WEEK_DISCOVERY"] = data["DAY_OF_WEEK_DISCOVERY"].replace({0:1, 1:2, 2:3, 3:4, 4:5, 5:6, 6:7})
@@ -619,7 +619,7 @@ if page == pages[3] :
   gc.collect()
 
   # Séparation du jeu en train et test
-  @st.cache_data(persist="True")
+  @st.cache_data(persist=True)
   def data_split(X, y):
     # Data split of features and target
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, shuffle = False)
@@ -629,7 +629,7 @@ if page == pages[3] :
 
 
   # Traitement des variables cycliques
-  @st.cache_data(persist="True")
+  @st.cache_data(persist=True)
   def cyclic_transform(X):
     # Séparation des variables suivant leur type
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
@@ -649,7 +649,7 @@ if page == pages[3] :
   circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
   gc.collect()
   # TRaitement des variables numériques
-  @st.cache_data(persist="True")
+  @st.cache_data(persist=True)
   def num_imputer(X):
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
     num_cols = feats.drop(circular_cols_init, axis = 1).columns
