@@ -1247,9 +1247,7 @@ if page == pages[4] :
    return y_train,y_test
  y_train,y_test=y_train_ytest(y_train,y_test)
  st.subheader("Objectif", divider="blue") 
- st.markdown("L'objectif du modèle est de définir la probabilité qu'un feu se transorme en feu de grande classe.
-              Les classes ont été regroupées de la façon suivante : la classe 0 (petite classe) regroupe les feux de classes A à C (0 à 100 acres),
-              la classe 1 (grande classe) regroupe les feux des classes D à G (100 à plus de 5000 acres).")
+ st.markdown("L'objectif du modèle est de définir la probabilité qu'un feu se transorme en feu de grande classe. Les classes ont été regroupées de la façon suivante : la classe 0 (petite classe) regroupe les feux de classes A à C (0 à 100 acres), la classe 1 (grande classe) regroupe les feux des classes D à G (100 à plus de 5000 acres).")  
  gc.collect()
 
  #if st.checkbox("Affichage répartition des classes") :
@@ -1284,7 +1282,7 @@ if page == pages[4] :
    Longitude=st.slider('Longitude',-178.00,-65.00,-119.00)
    Latitude=st.slider('Latitude',17.00,71.00,36.77)
    submit_button = st.form_submit_button(label='Execution')
-  data={'MONTH_DISCOVERY':mois,'STAT_CAUSE_DESCR':Cause,'AVG_TEMP [°C]':Température,'AVG_PCP [mm]':Précipitations,"LONGITUDE":Longitude,"LATITUDE":Latitude}
+  data={'MONTH'_DISCOVERY':mois,'STAT_CAUSE_DESCR':Cause,'AVG_TEMP [°C]':Température,'AVG_PCP [mm]':Précipitations,"LONGITUDE":Longitude,"LATITUDE":Latitude}
   input_df=pd.DataFrame(data,index=[0])
   input_array=np.array(input_df)
   input_fires=pd.concat([input_df,feats],axis=0)    
