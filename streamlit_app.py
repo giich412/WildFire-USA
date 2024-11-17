@@ -91,7 +91,7 @@ div[class^='block-container'] { padding-side: 2rem; }
 st.markdown(page_bg_img,unsafe_allow_html=True)
 st.markdown("""<style>.block-container {padding-top: 3rem;padding-bottom: 2rem;padding-left: 5rem;padding-right: 5rem;}</style>""", unsafe_allow_html=True)
 #Chargement dataframe sous alias df
-@st.cache_data(persist=True)
+@st.cache_data(persist=True, ttl=1200)
 def load_data():
   data=pd.read_csv('Firesclean.csv', index_col=0)
   return data
@@ -196,7 +196,7 @@ if page == pages[2] :
  
   col1, col2 =st.columns([0.55, 0.45],gap="small",vertical_alignment="center")
   with col1 :
-    @st.cache_data(persist=True)
+    @st.cache_data(persist=True, ttl=1200)
     def plot_violin():
       fig, axes = plt.subplots(2, 3,figsize=(12,7))
       #sns.set_style(style='white')
@@ -303,7 +303,7 @@ if page == pages[2] :
     fig2bis
 
   with col2 :
-    @st.cache_data(persist=True)
+    @st.cache_data(persist=True, ttl=1200)
     def graph_annee_nombre():
       fig3bis = px.area(df1bis, 'FIRE_YEAR' , "FPA_ID", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")
       fig3bis.update_layout(xaxis_title="",yaxis_title="",title_text="Répartition des feux par année et cause (en nombre)", title_x = 0.2, title_y = 0.99,paper_bgcolor='rgba(0,0,0,0)',
@@ -316,7 +316,7 @@ if page == pages[2] :
   st.write("**Périodes à risque**")
   st.write("Les mois de juin à août sont les plus dévastateurs ce qui qui peut sous-entendre 2 facteurs : un climat plus favorable aux départs de feux, des activités humaines à risque plus élevées pendant les périodes de vacances")
   #if st.checkbox("Afficher graphiques mois") :
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def hist_mois_acres_nb():
     fig3= make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("En surfaces brûlées (acres)","En Nombre de départs"))
     fig3.add_trace(go.Histogram(histfunc="sum",
@@ -336,7 +336,7 @@ if page == pages[2] :
   st.write("**Corrélation avec les feux d’origine humaine**")   
   st.write("On observe également des départs de feux significativement plus élevés le week-end. Ce qui peut être mis en corrélation avec les feux d'origine humaine déclenchés par des activités à risque plus propices en périodes de week-end (feux de camps...)")
   #if st.checkbox("Afficher graphiques jour de la semaine") :
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def hist_jours_acres_nb():
     df['DAY_OF_WEEK_DISCOVERYName'] = pd.to_datetime(df['DISCOVERY_DATE']).dt.day_name()
     Fires2=df.loc[df['STAT_CAUSE_DESCR']!="Foudre"]
@@ -361,7 +361,7 @@ if page == pages[2] :
 
   df3=df.groupby(['STAT_CAUSE_DESCR', 'DISCOVERY_DOY']).agg({"FIRE_SIZE":"sum"}).reset_index()
 
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def jour_cause(): 
     fig4bis = px.area(df3, 'DISCOVERY_DOY' , "FIRE_SIZE", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")
     fig4bis.update_layout(title_text="Répartition des feux jours de l'année et cause (en acres)", title_x = 0.3, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
@@ -375,7 +375,7 @@ if page == pages[2] :
   st.write('L’analyse de la durée des feux par cause montre une certaine hétérogénéité de la durée des feux en fonction de la cause. Les feux liés à la foudre sont en moyenne deux fois plus longs à contenir que les autres types de feux')
   st.write("La Foudre : Les feux déclenchés par la foudre sont souvent situés dans des zones difficiles d’accès, ce qui complique les efforts de lutte contre les incendies. De plus, ces feux peuvent se propager rapidement en raison des conditions météorologiques associées aux orages, comme les vents forts.")
   #if st.checkbox("Afficher graphiques par durée") :
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def durée(): 
     Fires_burn = df.dropna(subset=['CONT_DOY', 'DISCOVERY_DOY']).copy()
     Fires_burn['CONT_DOY'] = Fires_burn['CONT_DOY'].astype(int)
@@ -405,7 +405,7 @@ if page == pages[2] :
 #  st.markdown("**Facteurs Climatiques**- périodes de sécheresse prolongées")
 #  st.markdown("**Végétations**- type de végétation vulnérables aux feux et contribule à la propagation des feux")
 #  st.markdown("**Activités humaines**- l’urbanisation croissante dans les zones à risque, les pratiques agricoles, et les loisirs en plein air augmentent la probabilité de départs de feux")
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def load_FiresClasse():
     Fires_bis = df
     modif1 = ["Campfire", "Debris Burning", "Smoking", "Fireworks", "Children"]
@@ -508,7 +508,7 @@ if page == pages[2] :
   #if st.checkbox("Afficher heatmap") :
   st.write('Cette matrice permet d’identifier quelles variables ont de fortes corrélations entre elles, ce qui nous aide à **sélectionner les caractéristiques les plus pertinentes** pour notre modèle de Machine Learning.')
   st.write('Elles nous permettent de **comprendre les relations entre les variables**, d’améliorer la performance et l’interprétabilité du modèle en réduisant le bruit et en se concentrant sur les variables les plus influentes.')
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def heat_map():
     df_Fires_ML_num = df.select_dtypes(include=[np.number])
     plt.subplots(figsize = (7,7))
@@ -604,7 +604,7 @@ if page == pages[3] :
 
   # Séparation des variables du target
   Fires_ML = Fires_ML.drop("STAT_CAUSE_DESCR_1", axis = 1)
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def data_labeling(data):
     # Remplacement des jours de la semaine par 1 à 7 au lieu de 0 à 6
     data["DAY_OF_WEEK_DISCOVERY"] = data["DAY_OF_WEEK_DISCOVERY"].replace({0:1, 1:2, 2:3, 3:4, 4:5, 5:6, 6:7})
@@ -619,7 +619,7 @@ if page == pages[3] :
   gc.collect()
 
   # Séparation du jeu en train et test
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def data_split(X, y):
     # Data split of features and target
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, shuffle = False)
@@ -629,7 +629,7 @@ if page == pages[3] :
 
 
   # Traitement des variables cycliques
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def cyclic_transform(X):
     # Séparation des variables suivant leur type
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
@@ -649,7 +649,7 @@ if page == pages[3] :
   circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
   gc.collect()
   # TRaitement des variables numériques
-  @st.cache_data(persist=True)
+  @st.cache_data(persist=True, ttl=1200)
   def num_imputer(X):
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
     num_cols = feats.drop(circular_cols_init, axis = 1).columns
@@ -672,7 +672,7 @@ if page == pages[3] :
   num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
   #gc.collect()
   # Reconstitution du jeu de données après traitement
-  @st.cache_data(persist="True")
+  @st.cache_data(persist="True", ttl=1200)
   def X_concat(X_train_num, X_test_num, circular_train, circular_test):
     X_train_final = pd.concat([X_train_num, circular_train], axis = 1)
     X_test_final = pd.concat([X_test_num, circular_test], axis = 1)
@@ -718,7 +718,7 @@ if page == pages[3] :
   ######################################################################################################################################################################  
   
   # Tracé des courbes Precision_Recall  
-  @st.cache_data(persist="disk") 
+  @st.cache_data(persist="disk", ttl=1200) 
   def multiclass_PR_curve(_classifier, X_test, y_test):
     y_test= label_binarize(y_test, classes=np.unique(y_test))
     n_classes = y_test.shape[1]
@@ -804,7 +804,7 @@ if page == pages[3] :
   ######################################################################################################################################################################  
 
   # Labélisation des nouvelles données de prédiction
-  @st.cache_data(persist="disk")
+  @st.cache_data(persist="disk", ttl=1200)
   def real_data_process(data):
     # Initialisation du dataframe pour le ML
     data_shape = data.shape
@@ -1134,20 +1134,20 @@ if page == pages[3] :
 # Modèles de prédiction des classes
 if page == pages[4] :  
 
- @st.cache_data(persist=True)
+ @st.cache_data(persist=True, ttl=1200)
  def load_FiresML2():
   FiresML2= df.loc[:,['MONTH_DISCOVERY','FIRE_SIZE_CLASS','STAT_CAUSE_DESCR','AVG_TEMP [°C]','AVG_PCP [mm]','LONGITUDE','LATITUDE']]  
   FiresML2['FIRE_SIZE_CLASS'] = FiresML2['FIRE_SIZE_CLASS'].replace({"A":0,"B":0,"C":0,"D":1,"E":1,"F":1,"G":1})
   FiresML2=FiresML2.dropna() 
   return FiresML2
  FiresML2=load_FiresML2()
- @st.cache_data(persist=True)
+ @st.cache_data(persist=True, ttl=1200)
  def feats_target():
    feats = FiresML2.drop('FIRE_SIZE_CLASS', axis=1)
    target = FiresML2['FIRE_SIZE_CLASS'].astype('int')
    return feats, target
  feats,target=feats_target()
- @st.cache_data(persist=True)
+ @st.cache_data(persist=True, ttl=1200)
  def data_split(X, y):
   X_train, X_test, y_train, y_test = train_test_split(feats, target, test_size=0.25, random_state = 42,stratify=target)
   return X_train, X_test, y_train, y_test
@@ -1162,7 +1162,7 @@ if page == pages[4] :
  cat_test=X_test.drop(['AVG_TEMP [°C]','AVG_PCP [mm]','MONTH_DISCOVERY','LONGITUDE','LATITUDE'],axis=1)
  cat_train=oneh.fit_transform(cat_train)
  cat_test= oneh.transform(cat_test)
- @st.cache_data(persist=True)
+ @st.cache_data(persist=True, ttl=1200)
  def label_circ(X_train, X_test):
    circular_cols = ['MONTH_DISCOVERY']
    circular_train = X_train[circular_cols]
@@ -1173,13 +1173,13 @@ if page == pages[4] :
    circular_test['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
    return circular_train,circular_test
  circular_train,circular_test=label_circ(X_train,X_test)
- @st.cache_data(persist=True)
+ @st.cache_data(persist=True, ttl=1200)
  def X_train_X_test(X_train, X_test):
    X_train=np.concatenate((num_train,cat_train,circular_train),axis=1)
    X_test=np.concatenate((num_test,cat_test,circular_test), axis=1)
    return X_train,X_test
  X_train,X_test=X_train_X_test(X_train, X_test)
- @st.cache_data(persist=True)
+ @st.cache_data(persist=True, ttl=1200)
  def y_train_ytest(y_train,y_test):
    le = LabelEncoder()
    y_train = le.fit_transform(y_train)
@@ -1351,7 +1351,7 @@ if page == pages[4] :
   col1, col2,col3 = st.columns(3,gap="small",vertical_alignment="center")
   with col3:
    with st.container(height=350):
-        @st.cache_data(persist=True)
+        @st.cache_data(persist=True, ttl=1200)
         def ROCAUC():
          precision, recall, thresholds = precision_recall_curve(y_test, y_pred)
          fpr, tpr, thresholds = roc_curve(y_test, y_pred)
@@ -1366,7 +1366,7 @@ if page == pages[4] :
         figML2
    with col2:
     with st.container(height=350):
-     @st.cache_data(persist=True)
+     @st.cache_data(persist=True, ttl=1200)
      def MatriceConfusion():
       cm = confusion_matrix(y_test, y_pred)
       smallest_number = cm.min()
@@ -1381,7 +1381,7 @@ if page == pages[4] :
      figML1
    with col1 : 
     with st.container(height=350):
-     @st.cache_data(persist=True)
+     @st.cache_data(persist=True, ttl=1200)
      def FeatureImportance():    
         feats2 = {}
         for feature, importance in zip(feats.columns,model3.feature_importances_):
