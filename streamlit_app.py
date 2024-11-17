@@ -40,7 +40,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import precision_recall_curve, auc, PrecisionRecallDisplay, average_precision_score, roc_auc_score  
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import GradientBoostingClassifier
-import folium
+#import folium
 #from streamlit_folium import st_folium
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
