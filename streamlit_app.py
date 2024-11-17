@@ -471,7 +471,7 @@ if page == pages[2] :
 #      return fig7
 #    fig7=scatter_geo_global()
 #    fig7
-     gc.collect()  # Call garbage collection here
+gc.collect()  # Call garbage collection here
     #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
 
   #with col2:
@@ -500,7 +500,7 @@ if page == pages[2] :
   #    return fig7_
   #  fig7_=scatter_geo()
   #  fig7_
-     gc.collect()  # Call garbage collection here
+  gc.collect()  # Call garbage collection here
     #joblib.dump(st.plotly_chart(fig7_),"répartition_géo_mois")
          
      
