@@ -40,8 +40,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import precision_recall_curve, auc, PrecisionRecallDisplay, average_precision_score, roc_auc_score  
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import GradientBoostingClassifier
-#import folium
-#from streamlit_folium import st_folium
+import folium
+from streamlit_folium import st_folium
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 import sklearn.metrics as metrics
@@ -52,7 +52,6 @@ from sklearn.utils import class_weight
 import joblib
 from itertools import cycle
 import json
-import gc
 
 col1, col2, col3 = st.columns([0.6, 0.25, 0.15], gap="small", vertical_alignment="top")
 with col1:
@@ -251,7 +250,7 @@ if page == pages[2] :
   with st.container():
     col1, col2 = st.columns([0.6, 0.40],gap="small",vertical_alignment="center")
     with col1 :
-    #with st.container(height=400):      
+    #with st.container(height=400):
       Fires_class = df.groupby("FIRE_SIZE_CLASS").agg({"FPA_ID":"count", "FIRE_SIZE":"sum"}).reset_index()
       Fires_class = Fires_class.rename({"FPA_ID":"COUNT_FIRE", "FIRE_SIZE":"FIRE_SIZE_SUM"}, axis = 1)
       Indic = ["≈ ", "≈ ","≈ Connecticut", "≈ New Jersey", "≈ Maryland", "≈ Virginie Occidentale + Delaware", "≈ Californie + Hawaii"]
@@ -398,10 +397,8 @@ if page == pages[2] :
     return fig5
   fig5=durée()
   fig5
-  
-#if page == pages[3] : 
-#  st.header("DataVizualisation 2")
-  #st.write("Nous avons analysé le dataset sous différents angles afin d’en faire ressortir les principales caractéristiques.")
+ 
+ 
   st.subheader("4 - Répartition géographique")
   st.markdown("On observe une densité plus élevée de surfaces brûlées à l’ouest des États-Unis, ce qui pourrait être attribué à divers facteurs tels que le climat, la végétation et les activités humaines.")
   st.markdown("**Facteurs Climatiques**- périodes de sécheresse prolongées")
@@ -421,7 +418,6 @@ if page == pages[2] :
     FiresClasse = df[(Fires_bis['FIRE_SIZE_CLASS'] != "ABC")]
     return FiresClasse
   FiresClasse=load_FiresClasse()
-  #gc.collect()
     #fig6 = px.scatter_geo(FiresClasse,
     #      lon = FiresClasse['LONGITUDE'],
     #      lat = FiresClasse['LATITUDE'],
@@ -445,63 +441,61 @@ if page == pages[2] :
     
     #st.plotly_chart(fig6)
   #if st.checkbox("Afficher graphiques répartition géographique et année") :
-#  col1, col2 = st.columns(2)
+  col1, col2 = st.columns(2)
 
-#  with col1:
-#    @st.cache_data(persist=True)
-#    def scatter_geo_global():
-#      fig7 = px.scatter_geo(FiresClasse,
-#          lon = FiresClasse['LONGITUDE'],
-#          lat = FiresClasse['LATITUDE'],
-#          color="STAT_CAUSE_DESCR",
-#    #    #facet_col="FIRE_YEAR", #pour créer un graph par année
-#    #   #facet_col_wrap,# pour définir le nombre de graph par ligne
-#        #animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
-#          color_discrete_sequence=["blue","orange","red","grey","purple"],
-#          labels={"STAT_CAUSE_DESCR": "Cause"},
-#          hover_name="STATE", # column added to hover information
-#          size=FiresClasse['FIRE_SIZE']/1000, # size of markers
-#          projection='albers usa',
-#          width=800,
-#          height=500,
-#          title="Répartition géographique des feux par cause, taille",basemap_visible=True)
-#      fig7.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
-#      fig7.update_layout(title_text="Répartition géographique des feux par cause et taille", title_x = 0.1, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
-#      plot_bgcolor='rgba(0,0,0,0)',width=1000, height=700,legend=dict(title=None,x=0.5, y=0.85,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-#            family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=50, b=290),titlefont=dict(size=18))   
-#      return fig7
-#    fig7=scatter_geo_global()
-#    fig7
-#    gc.collect()  # Call garbage collection here
-    #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
-
-  #with col2:
-
-  #  @st.cache_data(persist=True)
-  #  def scatter_geo():
-  #    fig7_ = px.scatter_geo(FiresClasse,
-  #       lon = FiresClasse['LONGITUDE'],
-  #        lat = FiresClasse['LATITUDE'],
-  #        color="STAT_CAUSE_DESCR",
+  with col1:
+    @st.cache_data(persist=True)
+    def scatter_geo_global():
+      fig7 = px.scatter_geo(FiresClasse,
+         lon = FiresClasse['LONGITUDE'],
+          lat = FiresClasse['LATITUDE'],
+          color="STAT_CAUSE_DESCR",
     #    #facet_col="FIRE_YEAR", #pour créer un graph par année
      #   #facet_col_wrap,# pour définir le nombre de graph par ligne
-  #        animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
-  #        color_discrete_sequence=["blue","orange","red","grey","purple"],
-  #        labels={"STAT_CAUSE_DESCR": "Cause"},
-  #        hover_name="STATE", # column added to hover information
-  #        size=FiresClasse['FIRE_SIZE']/1000, # size of markers
-  #        projection='albers usa',
-  #        width=800,
-  #        height=500,
-  #        title="Focus par année",basemap_visible=True)
-  #    fig7_.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
-  #    fig7_.update_layout(title_text="Focus par année", title_x = 0.4, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
-  #    plot_bgcolor='rgba(0,0,0,0)',width=1000, height=500,legend=dict(title=None,x=0.5, y=0.95,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-  #          family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=100, b=50),titlefont=dict(size=18))   
-  #    return fig7_
-  #  fig7_=scatter_geo()
-  #  fig7_
-  #  gc.collect()  # Call garbage collection here
+        #animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
+          color_discrete_sequence=["blue","orange","red","grey","purple"],
+          labels={"STAT_CAUSE_DESCR": "Cause"},
+          hover_name="STATE", # column added to hover information
+          size=FiresClasse['FIRE_SIZE']/1000, # size of markers
+          projection='albers usa',
+          width=800,
+          height=500,
+          title="Répartition géographique des feux par cause, taille",basemap_visible=True)
+      fig7.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
+      fig7.update_layout(title_text="Répartition géographique des feux par cause et taille", title_x = 0.1, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
+      plot_bgcolor='rgba(0,0,0,0)',width=1000, height=700,legend=dict(title=None,x=0.5, y=0.85,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+            family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=50, b=290),titlefont=dict(size=18))   
+      return fig7
+    fig7=scatter_geo_global()
+    fig7
+    #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
+
+  with col2:
+
+    @st.cache_data(persist=True)
+    def scatter_geo():
+      fig7_ = px.scatter_geo(FiresClasse,
+         lon = FiresClasse['LONGITUDE'],
+          lat = FiresClasse['LATITUDE'],
+          color="STAT_CAUSE_DESCR",
+    #    #facet_col="FIRE_YEAR", #pour créer un graph par année
+     #   #facet_col_wrap,# pour définir le nombre de graph par ligne
+          animation_frame="FIRE_YEAR",#pour créer une animation sur l'année
+          color_discrete_sequence=["blue","orange","red","grey","purple"],
+          labels={"STAT_CAUSE_DESCR": "Cause"},
+          hover_name="STATE", # column added to hover information
+          size=FiresClasse['FIRE_SIZE']/1000, # size of markers
+          projection='albers usa',
+          width=800,
+          height=500,
+          title="Focus par année",basemap_visible=True)
+      fig7_.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True,bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='#e0efe7',projection_type="albers usa")
+      fig7_.update_layout(title_text="Focus par année", title_x = 0.4, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
+      plot_bgcolor='rgba(0,0,0,0)',width=1000, height=500,legend=dict(title=None,x=0.5, y=0.95,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+            family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=100, b=50),titlefont=dict(size=18))   
+      return fig7_
+    fig7_=scatter_geo()
+    fig7_
     #joblib.dump(st.plotly_chart(fig7_),"répartition_géo_mois")
          
      
@@ -528,7 +522,6 @@ if page == pages[2] :
     return fig7b
   fig7b=heat_map()
   fig7b 
- # gc.collect()
 
   st.write("En analysant ces données plus en détail, on peut mieux comprendre les facteurs qui contribuent aux feux. Ces données soulignent l’importance de la prévention des feux de foret d’origine humaine et de la gestion des risques naturels pour minimiser les dégâts causés par les feux de forêt.")
   
@@ -603,7 +596,6 @@ if page == pages[3] :
                - **:red[Criminelle] (1)** : Arson"
                - **:orange[Naturelle] (2)** : Ligthning
                """)
-      #gc.collect()
 
   ######################################################################################################################################################################
   ### Fonctions de preprocessing du jeu de données pour le ML ##########################################################################################################
@@ -654,7 +646,7 @@ if page == pages[3] :
     return circular_data
   circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
 
-  # Traitement des variables numériques
+  # TRaitement des variables numériques
   @st.cache_data(persist="disk")
   def num_imputer(X):
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
@@ -692,7 +684,7 @@ if page == pages[3] :
 
 
   # Réduction du modèle avec la méthode feature importances
-  @st.cache_resource#@st.cache_data(persist="disk")
+  @st.cache_data(persist="disk")
   def model_reduction(classifier, X_train, y_train):
     if classifier == "XGBoost":
        clf = XGBClassifier(tree_meethod = "approx",
@@ -759,7 +751,7 @@ if page == pages[3] :
 
   # Enregistrement des meilleurs modèles
   # Best xgb raw model
-  @st.cache_resource#@st.cache_data(persist="disk")
+  @st.cache_data(persist="disk")
   def best_xgb_raw_model(X, y):
       xgb_best_params = {"learning_rate": 0.015,
                         "max_depth": 3, 
@@ -771,7 +763,7 @@ if page == pages[3] :
       model = joblib.load("best_xgb_raw_model.joblib")
       return model
   # Best xgb raw model
-  @st.cache_resource#@st.cache_data(persist="disk")
+  @st.cache_data(persist="disk")
   def best_rf_raw_model(X, y):
      rf_best_params = {"n_estimators": 50,
                       "max_depth": 100,
@@ -783,7 +775,7 @@ if page == pages[3] :
      model = joblib.load("best_rf_raw_model.joblib")
      return model
   # Best LogReg raw model
-  @st.cache_resource#@st.cache_data(persist="disk")
+  @st.cache_data(persist="disk")
   def best_LogReg_raw_model(X, y):
      LogReg_best_params = {"C": 0.1,
                       "solver": "sag",
@@ -793,7 +785,7 @@ if page == pages[3] :
      model = joblib.load("best_lr_raw_model.joblib")
      return model
   # Best Decision Tree raw model
-  @st.cache_resource#@st.cache_data(persist="disk")
+  @st.cache_data(persist="disk")
   def best_DecTree_raw_model(X, y):
      DecTree_best_params = {"criterion": "gini"}
      clf_DecTree = DecisionTreeClassifier(**DecTree_best_params, random_state = 42).fit(X, y)
@@ -806,7 +798,6 @@ if page == pages[3] :
   ######################################################################################################################################################################  
 
   # Labélisation des nouvelles données de prédiction
-  @st.cache_data(persist="disk")
   def real_data_process(data):
     # Initialisation du dataframe pour le ML
     data_shape = data.shape
