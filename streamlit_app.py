@@ -91,7 +91,7 @@ div[class^='block-container'] { padding-side: 2rem; }
 st.markdown(page_bg_img,unsafe_allow_html=True)
 st.markdown("""<style>.block-container {padding-top: 3rem;padding-bottom: 2rem;padding-left: 5rem;padding-right: 5rem;}</style>""", unsafe_allow_html=True)
 #Chargement dataframe sous alias df
-@st.cache_data(persist="disk")
+@st.cache_data(persist=True)
 def load_data():
   data=pd.read_csv('Firesclean.csv', index_col=0)
   return data
@@ -240,7 +240,7 @@ if page == pages[2] :
       fig.update_layout(title_text="Répartition des feux par causes (1992 - 2015)", title_x = 0.2, title_y =0.99,paper_bgcolor='rgba(0,0,0,0)',
       plot_bgcolor='rgba(0,0,0,0)',legend=dict(x=0.0, y=0.95,orientation="h",font=dict(
             family="Arial",size=12,color="black")),margin=dict(l=10, r=10, t=2, b=0),titlefont=dict(size=15),width=900,height=350)
-      joblib.dump(st.plotly_chart(fig),"répartition_feux_acres")
+      #joblib.dump(st.plotly_chart(fig),"répartition_feux_acres")
   #Pie Chart répartition par cause
     with col2 :
   #if st.checkbox("Afficher graphiques par cause") :   
@@ -266,7 +266,7 @@ if page == pages[2] :
       fig1.update_layout(title_text="Répartition des feux suivant leur taille (1992 - 2015)", title_x = 0.2, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
       plot_bgcolor='rgba(0,0,0,0)',legend=dict(x=0.2, y=0.95,orientation="h",font=dict(
             family="Arial",size=12,color="black")),margin=dict(l=10, r=10, t=2, b=0),titlefont=dict(size=15),width=900,height=350)
-      joblib.dump(st.plotly_chart(fig1),"répartition_feux_nb")
+      #joblib.dump(st.plotly_chart(fig1),"répartition_feux_nb")
     with col2 :      
       st.write(":orange[Les feux de petite taille (A et B, <9,9 acres)] représentent :orange[62 % du nombre de départs] mais seulement :orange[2% des surfaces brûlées].  :orange[78 % des surfaces brûlées sont liées aux feux de la classe G] (avec des feux allant de 5000 à 600 000 acres).")
       
@@ -604,7 +604,7 @@ if page == pages[3] :
 
   # Séparation des variables du target
   Fires_ML = Fires_ML.drop("STAT_CAUSE_DESCR_1", axis = 1)
-  @st.cache_data(persist="disk")
+  @st.cache_data(persist="True")
   def data_labeling(data):
     # Remplacement des jours de la semaine par 1 à 7 au lieu de 0 à 6
     data["DAY_OF_WEEK_DISCOVERY"] = data["DAY_OF_WEEK_DISCOVERY"].replace({0:1, 1:2, 2:3, 3:4, 4:5, 5:6, 6:7})
@@ -619,7 +619,7 @@ if page == pages[3] :
   gc.collect()
 
   # Séparation du jeu en train et test
-  @st.cache_data(persist="disk")
+  @st.cache_data(persist="True")
   def data_split(X, y):
     # Data split of features and target
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, shuffle = False)
@@ -629,7 +629,7 @@ if page == pages[3] :
 
 
   # Traitement des variables cycliques
-  @st.cache_data(persist="disk")
+  @st.cache_data(persist="True")
   def cyclic_transform(X):
     # Séparation des variables suivant leur type
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
@@ -649,7 +649,7 @@ if page == pages[3] :
   circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
   gc.collect()
   # TRaitement des variables numériques
-  @st.cache_data(persist="disk")
+  @st.cache_data(persist="True")
   def num_imputer(X):
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
     num_cols = feats.drop(circular_cols_init, axis = 1).columns
@@ -670,9 +670,9 @@ if page == pages[3] :
     X_num = X_num.reset_index(drop = True)
     return X_num
   num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
-  gc.collect()
+  #gc.collect()
   # Reconstitution du jeu de données après traitement
-  @st.cache_data(persist="disk")
+  @st.cache_data(persist="True")
   def X_concat(X_train_num, X_test_num, circular_train, circular_test):
     X_train_final = pd.concat([X_train_num, circular_train], axis = 1)
     X_test_final = pd.concat([X_test_num, circular_test], axis = 1)
