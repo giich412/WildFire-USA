@@ -400,11 +400,11 @@ if page == pages[2] :
   fig5
  
  
-  st.subheader("4 - Répartition géographique")
-  st.markdown("On observe une densité plus élevée de surfaces brûlées à l’ouest des États-Unis, ce qui pourrait être attribué à divers facteurs tels que le climat, la végétation et les activités humaines.")
-  st.markdown("**Facteurs Climatiques**- périodes de sécheresse prolongées")
-  st.markdown("**Végétations**- type de végétation vulnérables aux feux et contribule à la propagation des feux")
-  st.markdown("**Activités humaines**- l’urbanisation croissante dans les zones à risque, les pratiques agricoles, et les loisirs en plein air augmentent la probabilité de départs de feux")
+#  st.subheader("4 - Répartition géographique")
+#  st.markdown("On observe une densité plus élevée de surfaces brûlées à l’ouest des États-Unis, ce qui pourrait être attribué à divers facteurs tels que le climat, la végétation et les activités humaines.")
+#  st.markdown("**Facteurs Climatiques**- périodes de sécheresse prolongées")
+#  st.markdown("**Végétations**- type de végétation vulnérables aux feux et contribule à la propagation des feux")
+#  st.markdown("**Activités humaines**- l’urbanisation croissante dans les zones à risque, les pratiques agricoles, et les loisirs en plein air augmentent la probabilité de départs de feux")
   @st.cache_data(persist=True)
   def load_FiresClasse():
     Fires_bis = df
