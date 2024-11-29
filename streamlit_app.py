@@ -1,5 +1,4 @@
 import streamlit as st
-st.set_page_config(page_title="Projet Feux de Forêt",layout="wide",)
 import pandas as pd
 import requests
 import seaborn as sns
@@ -54,6 +53,12 @@ from itertools import cycle
 import json
 import gc
 
+st.set_page_config(
+  page_title="Projet Feux de Forêt",
+  layout="wide",
+  initial_sidebar_state="expanded"
+  )
+
 col1, col2, col3 = st.columns([0.6, 0.25, 0.15], gap="small", vertical_alignment="top")
 with col1:
   st.title("Prédiction des feux de forêts aux USA 🔥")
@@ -71,25 +76,87 @@ with col3:
 
 st.subheader("", divider="gray")
 
-# Mise en forme couleur du fond de l'application
+
+#    page_title="Custom Themed App",
+#    page_icon="🔥",
+
+# Custom CSS to set the theme colors
+#page_bg_img = """
+#<style>
+#body {
+#    background-color: #333341;
+#    color: #F5F5F5;
+#}
+#.sidebar .sidebar-content {
+#    background-color: #DE8B29;
+#}
+#header .css-1d391kg {
+#    background-color: #C70001;
+#}
+#</style>
+#"""
+
+#st.markdown(page_bg_img, unsafe_allow_html=True)
+#st.markdown("""<style>.block-container {padding-top: 3rem;padding-bottom: 2rem;padding-left: 5rem;padding-right: 5rem;}</style>""", unsafe_allow_html=True)
+
+# Mise en forme couleur du fond de l'application C70001 #DE8B29
 page_bg_img="""<style>
 [data-testid="stAppViewContainer"]{
-background-color: #F4E4AA;
+background-color: #333341;
+#color: #F5F5F5
 opacity: 1;
-background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #F4E4AA 10px ), repeating-linear-gradient( #F4E4AA55, #F4E4AA );}
+#background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #F5F5F5 10px ), repeating-linear-gradient( #DE8B29, #F5F5F5 );}
 [data-testid="stHeader"]{
-background-color: #F4E4AA;
+background-color: #333341;
+#color: #F5F5F5
 opacity: 1;
-background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #F4E4AA 10px ), repeating-linear-gradient( #F4E4AA55, #F4E4AA );}
+#background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #F5F5F5 10px ), repeating-linear-gradient( #DE8B29, #F5F5F5 );}
 [data-testid="stSidebarContent"]{
-background-color: #F4E4AA;
-opacity: 0.8;
-background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #F4E4AA 10px ), repeating-linear-gradient( #F4E4AA55, #F4E4AA );}
+background-color: #DE8B29;
+#color: #000000
+opacity: 1;
+#background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #F5F5F5 10px ), repeating-linear-gradient( #DE8B29, #F5F5F5 );}
 [data-testid="stAppViewContainer"] { padding-top: 0rem; }
 div[class^='block-container'] { padding-side: 2rem; }
+/* Main content text color */
+h1, h2, h3, h4, h5, h6, p, div, span, a, li, label {
+    color: #FFFFFF;
+}
+/* Select box background color */
+.stSelectbox div[data-baseweb="select"] > div {
+background-color: #333341;  
+color: #A9A9A9;  
+}
+
+/* Dropdown menu background color */
+.stSelectbox div[data-baseweb="select"] ul {
+background-color: #333341;  
+}
+
+.stSelectbox div[data-baseweb="select"] ul li {
+color: #A9A9A9;  
+}
+
+/* Button background color */
+div.stButton > button {
+background-color: #333341; 
+color: black;  
+}
 </style>"""
 st.markdown(page_bg_img,unsafe_allow_html=True)
 st.markdown("""<style>.block-container {padding-top: 3rem;padding-bottom: 2rem;padding-left: 5rem;padding-right: 5rem;}</style>""", unsafe_allow_html=True)
+st.markdown(
+    """
+    <style>
+    .stAppViewContainer {
+        color: black;  /* Set text font color to black */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 #Chargement dataframe sous alias df
 @st.cache_data(ttl=3600)
 def load_data():
@@ -189,23 +256,41 @@ elif page == pages[2] :
     
     if subpage == subpages[0]:
         st.subheader("1 - Analyse des outliers et de la répartitions des valeurs numériques")
-        col1, col2 =st.columns([0.55, 0.45],gap="small",vertical_alignment="center")
-        with col1 :
+        col1, col2 = st.columns([0.55, 0.45], gap="small", vertical_alignment="center")
+        with col1:
           @st.cache_data(ttl=1200)
-          def plot_violin():
-            fig, axes = plt.subplots(2, 3,figsize=(12,7))
-            #sns.set_style(style='white')
-            sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
-            sns.set_theme()
-            sns.violinplot(ax=axes[0, 0], x=df['DURATION'])
-            sns.violinplot(ax=axes[0, 1],x=df['FIRE_SIZE'])
-            sns.violinplot(ax=axes[0, 2],x=df['AVG_PCP [mm]'])
-            sns.violinplot(ax=axes[1,0],x=df['LATITUDE'])
-            sns.violinplot(ax=axes[1, 1],x=df['LONGITUDE'])
-            sns.violinplot(ax=axes[1, 2],x=df['AVG_TEMP [°C]'])
+          def plot_box():
+            fig, axes = plt.subplots(2, 3, figsize=(12, 7))
+            sns.set(rc={"axes.facecolor": "#333341", "figure.facecolor": "#333341"}) #F4E4AA
+            sns.set_theme(style='dark')
+            sns.boxplot(ax=axes[0, 0], x=df['DURATION'])
+            sns.boxplot(ax=axes[0, 1], x=df['FIRE_SIZE'])
+            sns.boxplot(ax=axes[0, 2], x=df['AVG_PCP [mm]'])
+            sns.boxplot(ax=axes[1, 0], x=df['LATITUDE'])
+            sns.boxplot(ax=axes[1, 1], x=df['LONGITUDE'])
+            sns.boxplot(ax=axes[1, 2], x=df['AVG_TEMP [°C]'])
             return fig
-          fig=plot_violin()
-          fig 
+          fig = plot_box()
+          st.pyplot(fig)
+
+        #st.subheader("1 - Analyse des outliers et de la répartitions des valeurs numériques")
+        #col1, col2 =st.columns([0.55, 0.45],gap="small",vertical_alignment="center")
+        #with col1 :
+        #  @st.cache_data(ttl=1200)
+        #  def plot_violin():
+        #    fig, axes = plt.subplots(2, 3,figsize=(12,7))
+        #    #sns.set_style(style='white')
+        #    sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
+        #    sns.set_theme()
+        #    sns.violinplot(ax=axes[0, 0], x=df['DURATION'])
+        #    sns.violinplot(ax=axes[0, 1],x=df['FIRE_SIZE'])
+        #    sns.violinplot(ax=axes[0, 2],x=df['AVG_PCP [mm]'])
+        #    sns.violinplot(ax=axes[1,0],x=df['LATITUDE'])
+        #    sns.violinplot(ax=axes[1, 1],x=df['LONGITUDE'])
+        #    sns.violinplot(ax=axes[1, 2],x=df['AVG_TEMP [°C]'])
+        #    return fig
+        #  fig=plot_violin()
+        #  fig 
 
         with col2 :
           st.markdown("Certaines variables comme les tailles de feux et les durées présentent des valeurs particulièrement extrêmes.")  
@@ -229,7 +314,7 @@ elif page == pages[2] :
                                  hole=0.6, direction="clockwise", title=dict(text="Surfaces (acres)", font=dict(size=20))), row=1, col=2)
             fig.update_traces(textfont_size=15, sort=False, marker=dict(colors=['#F1C40F', '#F39C12', '#e74c3c', '#E67E22', '#d35400']))
             fig.update_layout(title_text="Répartition des feux par causes (1992 - 2015)", title_x=0.2, title_y=0.99, paper_bgcolor='rgba(0,0,0,0)',
-                              plot_bgcolor='rgba(0,0,0,0)', legend=dict(x=0.0, y=0.95, orientation="h", font=dict(family="Arial", size=12, color="black")),
+                              plot_bgcolor='rgba(0,0,0,0)', legend=dict(x=0.0, y=0.95, orientation="h", font=dict(family="Arial", size=12, color="white")),
                               margin=dict(l=10, r=10, t=2, b=0), titlefont=dict(size=15), width=900, height=350)
             return fig
           fig = plot_fire_cause_pie_charts(df)
@@ -258,7 +343,7 @@ elif page == pages[2] :
             fig1.update_traces(textfont_size=15,sort=False,marker=dict(colors=['yellow','brown','#F1C40F', '#F39C12', '#e74c3c','#E67E22','#d35400']))
             fig1.update_layout(title_text="Répartition des feux suivant leur taille (1992 - 2015)", title_x = 0.2, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',legend=dict(x=0.2, y=0.95,orientation="h",font=dict(
-                  family="Arial",size=12,color="black")),margin=dict(l=10, r=10, t=2, b=0),titlefont=dict(size=15),width=900,height=350)
+                  family="Arial",size=12,color="white")),margin=dict(l=10, r=10, t=2, b=0),titlefont=dict(size=15),width=900,height=350)
             return fig1
           fig1 = plot_fire_class_pie_charts(df)
           st.plotly_chart(fig1)
@@ -278,10 +363,10 @@ elif page == pages[2] :
         with col1 :
           @st.cache_data(ttl=1200)
           def graph_annee():
-            fig2bis = px.area(df1, 'FIRE_YEAR' , "FIRE_SIZE", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")    
+            fig2bis = px.area(df1, 'FIRE_YEAR' , "FIRE_SIZE", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR", color_discrete_sequence=px.colors.sequential.Reds_r)    
             fig2bis.update_layout(xaxis_title="",yaxis_title="",title_text="Répartition des feux par année et cause (en acres)", title_x = 0.2, title_y = 0.99,paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',width=700, height=350,legend=dict(x=0, y=1,title=None,orientation="v",font=dict(
-                  family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=20, b=50),titlefont=dict(size=15))
+                  family="Arial",size=11,color="white")),margin=dict(l=0, r=0, t=20, b=50),titlefont=dict(size=15),xaxis=dict(gridcolor='darkgrey'),yaxis=dict(gridcolor='darkgrey'))
             return fig2bis
           fig2bis=graph_annee()
           fig2bis
@@ -289,10 +374,10 @@ elif page == pages[2] :
         with col2 :
           @st.cache_data(ttl=1200)
           def graph_annee_nombre():
-            fig3bis = px.area(df1bis, 'FIRE_YEAR' , "FPA_ID", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")
+            fig3bis = px.area(df1bis, 'FIRE_YEAR' , "FPA_ID", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR", color_discrete_sequence=px.colors.sequential.Reds_r)
             fig3bis.update_layout(xaxis_title="",yaxis_title="",title_text="Répartition des feux par année et cause (en nombre)", title_x = 0.2, title_y = 0.99,paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',width=700, height=350,legend=dict(title=None,x=0, y=1,orientation="v",font=dict(
-                  family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=20, b=00),titlefont=dict(size=15))
+                  family="Arial",size=11,color="white")),margin=dict(l=0, r=0, t=20, b=00),titlefont=dict(size=15),xaxis=dict(gridcolor='darkgrey'),yaxis=dict(gridcolor='darkgrey'))
             return fig3bis
           fig3bis=graph_annee_nombre()
           fig3bis
@@ -306,12 +391,12 @@ elif page == pages[2] :
           fig3= make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("En surfaces brûlées (acres)","En Nombre de départs"))
           fig3.add_trace(go.Histogram(histfunc="sum",
             name="Surface brûlées (acres) ",
-            x=df['MONTH_DISCOVERY'],y=df['FIRE_SIZE'], marker_color='red'),1,1)
+            x=df['MONTH_DISCOVERY'],y=df['FIRE_SIZE'], marker_color='orangered'),1,1)
           fig3.add_trace(go.Histogram(histfunc="count",
             name="Nombre de feux",
-            x=df['MONTH_DISCOVERY'],marker_color='blue'),1,2)
-          fig3.update_layout(title_text="Départs de feux par mois",bargap=0.2,height=400, width=1100, coloraxis=dict(colorscale='Bluered_r'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
-          plot_bgcolor='rgba(0,0,0,0)')
+            x=df['MONTH_DISCOVERY'],marker_color='darkred'),1,2)
+          fig3.update_layout(title_text="Départs de feux par mois",bargap=0.2,height=400, width=1100, coloraxis=dict(colorscale='Reds'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)', #coloraxis=dict(colorscale='Bluered_r')
+          plot_bgcolor='rgba(0,0,0,0)',xaxis=dict(gridcolor='darkgrey'),yaxis=dict(gridcolor='darkgrey'))
           return fig3
         fig3=hist_mois_acres_nb()
         fig3
@@ -333,12 +418,12 @@ elif page == pages[2] :
           fig4 = make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("En surfaces brûlées (acres)","En Nombre de départs"))
           fig4.add_trace(go.Histogram(histfunc="sum",
             name="Surface brûlées (acres) ",
-            x=Fires4.index,y=Fires4.values, marker_color='red'),1,1)
+            x=Fires4.index,y=Fires4.values, marker_color='orangered'),1,1)
           fig4.add_trace(go.Histogram(histfunc="sum",
             name="Nombre de feux",
-            x=Fires3.index,y=Fires3.values,marker_color='blue'),1,2)
-          fig4.update_layout(title_text="Départs de feux en fonction du jour de la semaine",bargap=0.2,height=400, width=1000, coloraxis=dict(colorscale='Bluered_r'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
-          plot_bgcolor='rgba(0,0,0,0)')
+            x=Fires3.index,y=Fires3.values,marker_color='darkred'),1,2)
+          fig4.update_layout(title_text="Départs de feux en fonction du jour de la semaine",bargap=0.2,height=400, width=1000, coloraxis=dict(colorscale='Reds'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
+          plot_bgcolor='rgba(0,0,0,0)',xaxis=dict(gridcolor='darkgrey'),yaxis=dict(gridcolor='darkgrey'))
           return fig4
         fig4=hist_jours_acres_nb()
         fig4
@@ -347,10 +432,10 @@ elif page == pages[2] :
 
         @st.cache_data(ttl=1200)
         def jour_cause(): 
-          fig4bis = px.area(df3, 'DISCOVERY_DOY' , "FIRE_SIZE", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR")
+          fig4bis = px.area(df3, 'DISCOVERY_DOY' , "FIRE_SIZE", color="STAT_CAUSE_DESCR", line_group="STAT_CAUSE_DESCR", color_discrete_sequence=px.colors.sequential.Reds_r)  #Reds_r
           fig4bis.update_layout(title_text="Répartition des feux jours de l'année et cause (en acres)", title_x = 0.3, title_y = 1,paper_bgcolor='rgba(0,0,0,0)',
           plot_bgcolor='rgba(0,0,0,0)',width=1000, height=400,legend=dict(title=None,x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-                  family="Arial",size=15,color="black")),margin=dict(l=100, r=100, t=25, b=50),titlefont=dict(size=20))
+                  family="Arial",size=15,color="white")),margin=dict(l=100, r=100, t=25, b=50),titlefont=dict(size=20),xaxis=dict(gridcolor='darkgrey'),yaxis=dict(gridcolor='darkgrey'))
           return fig4bis
         fig4bis=jour_cause()
         fig4bis
@@ -515,7 +600,7 @@ elif page == pages[2] :
             fig7_.update_geos(resolution=50,lataxis_showgrid=True, lonaxis_showgrid=True, bgcolor='rgba(0,0,0,0)',framecolor='blue',showframe=True,showland=True,landcolor='rgb(100,100,100)',projection_type="albers usa") #bgcolor='rgba(0,0,0,0)', landcolor='#e0efe7'
             fig7_.update_layout(title_text="Répartition géographique des feux par cause et taille", title_x = 0.3, title_y = 0.95,paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',width=1500, height=800,legend=dict(title=None,x=0.5, y=0.95,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-                  family="Arial",size=11,color="black")),margin=dict(l=0, r=0, t=100, b=50),titlefont=dict(size=18))   
+                  family="Arial",size=11,color="white")),margin=dict(l=0, r=0, t=100, b=50),titlefont=dict(size=18))   
             return fig7_
         fig7_=scatter_geo()
         fig7_
@@ -535,13 +620,19 @@ elif page == pages[2] :
           df_Fires_ML_num = df.select_dtypes(include=[np.number])
           plt.subplots(figsize = (7,7))
           sns.set_style(style='white')
-          sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
+          sns.set(rc={"axes.facecolor": "#333341", "figure.facecolor": "#333341"})
           df_Fires_ML_num = df.select_dtypes(include=[np.number])
           mask = np.zeros_like(df_Fires_ML_num.corr(), dtype='bool')
           mask[np.triu_indices_from(mask)] = True
           fig7b, ax = plt.subplots(figsize = (10,7))
-          sns.heatmap(df_Fires_ML_num.corr(), cmap=sns.diverging_palette(20, 220, n=200), annot=True, center = 0, mask=mask, annot_kws={"size": 8})
-          plt.title("Heatmap of all the selected features of data set", fontsize = 15)
+          sns.heatmap(df_Fires_ML_num.corr(), cmap=sns.diverging_palette(20, 220, n=200), annot=True, center = 0, mask=mask, annot_kws={"size": 8}, ax=ax)
+          plt.title("Heatmap of all the selected features of data set", fontsize = 13, color='white')
+          ax.tick_params(colors='white', labelsize = 8)  
+          ax.xaxis.label.set_color('white')  
+          ax.xaxis.label.set_size(8) 
+          ax.yaxis.label.set_color('white')
+          ax.yaxis.label.set_size(8)
+          ax.grid(False) 
           return fig7b
         fig7b=heat_map()
         fig7b 
@@ -588,10 +679,15 @@ if page == pages[3] :
       ax.bar(count.index, count.values, label = Fires_ML["STAT_CAUSE_DESCR_1"].unique(), color=color)
       ax.set_facecolor('none') 
       fig.patch.set_alpha(0.0) 
-      ax.set_ylabel("COUNT", fontsize=20)
+      ax.set_ylabel("COUNT", fontsize=20, color='white')
       ax.set_xticks(range(len(count.index)))
-      ax.set_xticklabels(count.index, rotation=75, fontsize=18)
+      ax.set_xticklabels(count.index, rotation=75, fontsize=18, color='white')
       ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
+      ax.grid(color='black')
+      ax.spines['bottom'].set_color('black')
+      ax.spines['top'].set_color('black')
+      ax.spines['left'].set_color('black')
+      ax.spines['right'].set_color('black')
       st.pyplot(fig)
       st.markdown("""<div style="text-align: justify;">
                   On observe un grand déséquilibre du jeu de données. Ce qui va rendre complexe la prédiction de l'analyse.
@@ -608,10 +704,15 @@ if page == pages[3] :
       ax.bar(count2.index, count2.values, color=color)
       ax.set_facecolor('none') 
       fig.patch.set_alpha(0.0) 
-      ax.set_ylabel("COUNT", fontsize = 20)
+      ax.set_ylabel("COUNT", fontsize = 20, color='white')
       ax.set_xticks([0, 1, 2])
-      ax.set_xticklabels(["Humaine", "Criminelle", "Naturelle"], rotation = 25, fontsize = 18)
+      ax.set_xticklabels(["Humaine", "Criminelle", "Naturelle"], rotation = 25, fontsize = 18, color='white')
       ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
+      ax.grid(color='black')
+      ax.spines['bottom'].set_color('black')
+      ax.spines['top'].set_color('black')
+      ax.spines['left'].set_color('black')
+      ax.spines['right'].set_color('black')
       st.pyplot(fig)
 
       st.write("Suppresion des causses non-définies : Missing/Undefined, Miscellaneous, Others")
@@ -768,7 +869,7 @@ if page == pages[3] :
         fig.add_trace(go.Scatter(x=recall[i], y=precision[i], mode='lines', name=f'Class {i} (AP = {average_precision[i]:0.2f})', line=dict(color=color)))
 
     fig.update_layout(
-        title='Courbe Precision-Recall',
+        title={'text': 'Courbe Precision-Recall', 'font': {'color': 'white'}},
         xaxis_title='Recall',
         yaxis_title='Precision',
         legend_title='Classes'
@@ -1023,11 +1124,16 @@ if page == pages[3] :
       with col3:
           with st.container():
               #st.subheader("Courbe Precision Recall")
-              fig= multiclass_PR_curve(model, X_test_final[feat_imp], y_test) 
-              fig.update_layout({
-              'plot_bgcolor': 'rgba(0, 0, 0, 0)',
-              'paper_bgcolor': 'rgba(0, 0, 0, 0)'
-          })
+              fig = multiclass_PR_curve(model, X_test_final[feat_imp], y_test)
+              fig.update_layout(
+              plot_bgcolor='rgba(0, 0, 0, 0)',
+              paper_bgcolor='rgba(0, 0, 0, 0)',
+              title_text='Courbe Precision-Recall',
+              title_font_color='white',
+              titlefont=dict(size=15),
+              margin=dict(l=55, r=55, t=55, b=55),
+              legend=dict(font=dict(family="Arial", size=8, color="white"))
+              )
               st.plotly_chart(fig)
               gc.collect()   
             
@@ -1035,9 +1141,9 @@ if page == pages[3] :
           with st.container():
               #st.subheader("Matrice de Confusion")
               figML = px.imshow(cm, labels={"x": "Classes Prédites", "y": "Classes réelles"}, color_continuous_scale = "RdYlGn", width=400, height=400, text_auto=True)  
-              figML.update_layout(title='Confusion Matrix', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', width=1000, height=500, legend=dict(
-                  x=0.5, y=1.05, orientation="h", xanchor="center", yanchor="bottom", font=dict(family="Arial", size=15, color="black")),
-                margin=dict(l=100, r=100, t=100, b=100), titlefont=dict(size=20))
+              figML.update_layout(title_text='Confusion Matrix', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', width=1000, height=500, legend=dict(
+                  x=0.5, y=1.05, orientation="h", xanchor="center", yanchor="bottom", font=dict(family="Arial", size=15, color="white")),
+                margin=dict(l=100, r=100, t=100, b=100), titlefont=dict(size=15), title_font_color='white')
               st.plotly_chart(figML)
               gc.collect()
 
@@ -1051,16 +1157,17 @@ if page == pages[3] :
                   feat_imp = pd.Series(avg_importance_values, index=X_test_final.columns).sort_values(ascending=True)
               feat_imp = feat_imp.loc[feat_imp.values > 0]
               fig = px.bar(feat_imp, x=feat_imp.values, y=feat_imp.index, orientation='h')
-              fig.update_layout(title='Feature Importance',
+              fig.update_layout(title_text='Feature Importance',
                                 xaxis_title='Importance',
                                 yaxis_title='Features',
                                 paper_bgcolor='rgba(0,0,0,0)',  
                                 plot_bgcolor='rgba(0,0,0,0)',  
                                 width=1000, height=500,
                                 legend=dict(x=0.5, y=0.93, orientation="h", xanchor="center", yanchor="bottom",
-                                            font=dict(family="Arial", size=15, color="black")),
+                                            font=dict(family="Arial", size=15, color="white")),
                                 margin=dict(l=100, r=100, t=100, b=100),
-                                titlefont=dict(size=15))
+                                titlefont=dict(size=15),
+                                title_font_color= 'white')
               st.plotly_chart(fig)
               gc.collect()
 
@@ -1177,14 +1284,14 @@ if page == pages[3] :
       y_pred.loc[y_pred["FIRE CAUSE"] == 1, "FIRE CAUSE"] = "Criminelle 🦹🏻‍♂️🔥"
       y_pred.loc[y_pred["FIRE CAUSE"] == 2, "FIRE CAUSE"] = "Naturelle 🌩️"
       st.dataframe(y_pred)
-      gc.collect()
+      #gc.collect()
 
 # Modèles de prédiction des classes
 if page == pages[4] :  
 
  @st.cache_data(ttl=1200)
  def load_FiresML2():
-  FiresML2= df.loc[:,['MONTH_DISCOVERY','FIRE_SIZE_CLASS','STAT_CAUSE_DESCR','AVG_TEMP [°C]','AVG_PCP [mm]','LONGITUDE','LATITUDE']]  
+  FiresML2= df.loc[:,['MONTH_DISCOVERY','FIRE_SIZE_CLASS','STAT_CAUSE_DESCR','AVG_TEMP [°C]','AVG_PCP [mm]','LONGITUDE','LATITUDE']]   #'AVG_TEMP [°C]','AVG_PCP [mm]'
   FiresML2['FIRE_SIZE_CLASS'] = FiresML2['FIRE_SIZE_CLASS'].replace({"A":0,"B":0,"C":0,"D":1,"E":1,"F":1,"G":1})
   FiresML2=FiresML2.dropna() 
   return FiresML2
@@ -1248,25 +1355,25 @@ if page == pages[4] :
  st.markdown("L'objectif du modèle est de définir la probabilité qu'un feu se transorme en feu de grande classe. Les classes ont été regroupées de la façon suivante : la classe 0 (petite classe) regroupe les feux de classes A à C (0 à 100 acres), la classe 1 (grande classe) regroupe les feux des classes D à G (100 à plus de 5000 acres).")  
  gc.collect()
 
- #if st.checkbox("Affichage répartition des classes") :
- with st.container():
-   #@st.cache_data(persist=True)
-   #def Rep_Class():
-    fig30= make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("Répartition avant regroupement","Répartition après regroupement"))
-    fig30.add_trace(go.Histogram(histfunc="count",
-    name="Répartition des classes avant regroupement",
-     x=df['FIRE_SIZE_CLASS'], marker_color='red'),1,1)    
-    fig30.update_xaxes(categoryorder='array', categoryarray= ['A', 'B', 'C', 'D', 'E', 'F', 'G'])
-    fig30.add_trace(go.Histogram(histfunc="count",
-      name="Répartition Classe",
-      x=FiresML2['FIRE_SIZE_CLASS'],marker_color='blue'),1,2)
-    fig30.update_layout(bargap=0.2,height=300, width=1100, coloraxis=dict(colorscale='Bluered_r'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)')
-    #return fig30
-   #fig30=Rep_Class()
-   #fig30
- joblib.dump(st.plotly_chart(fig30),"Répartition Classe")
- gc.collect()
+ if st.checkbox("Affichage répartition des classes") :
+     with st.container():
+     #@st.cache_data(persist=True)
+     #def Rep_Class():
+        fig30= make_subplots(rows=1, cols=2, shared_yaxes=False,subplot_titles=("Répartition avant regroupement","Répartition après regroupement"))
+        fig30.add_trace(go.Histogram(histfunc="count",
+        name="Répartition des classes avant regroupement",
+          x=df['FIRE_SIZE_CLASS'], marker_color='Orangered'),1,1)    
+        fig30.update_xaxes(categoryorder='array', categoryarray= ['A', 'B', 'C', 'D', 'E', 'F', 'G'])
+        fig30.add_trace(go.Histogram(histfunc="count",
+          name="Répartition Classe",
+          x=FiresML2['FIRE_SIZE_CLASS'],marker_color='darkred'),1,2)
+        fig30.update_layout(bargap=0.2,height=300, width=1100, coloraxis=dict(colorscale='Bluered_r'), showlegend=False,paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)')
+        #return fig30
+       #fig30=Rep_Class()
+       #fig30
+     joblib.dump(st.plotly_chart(fig30),"Répartition Classe")
+     gc.collect()
 
  with st.sidebar :  
   with st.form(key='my_form2'):
@@ -1280,7 +1387,7 @@ if page == pages[4] :
    Longitude=st.slider('Longitude',-178.00,-65.00,-119.00)
    Latitude=st.slider('Latitude',17.00,71.00,36.77)
    submit_button = st.form_submit_button(label='Execution')
-  data={'MONTH DISCOVERY':mois,'STAT_CAUSE_DESCR':Cause,'AVG_TEMP [C]':Température,'AVG_PCP [mm]':Précipitations,"LONGITUDE":Longitude,"LATITUDE":Latitude}
+  data={'MONTH_DISCOVERY':mois,'STAT_CAUSE_DESCR':Cause,'AVG_TEMP [°C]':Température,'AVG_PCP [mm]':Précipitations,"LONGITUDE":Longitude,"LATITUDE":Latitude}
   input_df=pd.DataFrame(data,index=[0])
   input_array=np.array(input_df)
   input_fires=pd.concat([input_df,feats],axis=0)    
@@ -1299,7 +1406,7 @@ if page == pages[4] :
  #classifier=st.selectbox("Sélection du modèle",("BalancedRandomForest","XGBoost"))
  #with st.form(key='my_form'):
   #submit_button = st.form_submit_button(label='Submit')
- 
+
  if classifier == "XGBoost":       
   model = joblib.load("model.joblib")
   y_pred=model.predict(X_test)
@@ -1310,103 +1417,117 @@ if page == pages[4] :
   df_prediction_proba.rename(columns={0:"Petite Classe",1:"Grande Classe"})
   Fires_class_pred=np.array(['Petite Classe','Grande Classe'])
   gc.collect()
- #classifier=st.selectbox("Sélection du modèle",("XGBoost","BalancedRandomForest"))
- #if classifier == "XGBoost":
-  #model = joblib.load("model.joblib")
-   #if st.sidebar.button("Execution modèle XGB",key="classify"):
-   #st.subheader("XGBoost Results")
-  #model=XGBClassifier(max_bin=410,
-  #                      scale_pos_weight=29.3333,
-  #                     subsample=0.91,
-  #                     colsample_bytree=0.65,
-  #                     learning_rate=0.31).fit(X_train,y_train)
-  #joblib.dump(model, "model.joblib")  
-  #model = joblib.load("model.joblib")   
+
   st.subheader("Importance features et performance du modèle XGBoost optimisé", divider="blue")
   st.write("Accuracy",round(model.score(X_test,y_test),4))
   st.write("Recall",round(recall_score(y_test,y_pred),4))  
 
   col1, col2,col3 = st.columns(3,gap="small",vertical_alignment="center")
-  with col3:
-   with st.container(height=350):
-    @st.cache_data(ttl=1200)
-    def AUC():      
-     precision, recall, thresholds = precision_recall_curve(y_test, y_pred)
-     fpr, tpr, thresholds = roc_curve(y_test, y_pred)
-     roc_auc = auc(fpr, tpr)
-     figML2 = px.area(x=fpr, y=tpr,title=f'Courbe ROC (AUC={auc(fpr, tpr):.4f})',labels=dict(x='Taux faux positifs', y='Taux vrais positifs'))
-     figML2.add_shape(type='line', line=dict(dash='dash'),x0=0, x1=1, y0=0, y1=1)
-     figML2.update_yaxes(scaleanchor="x", scaleratio=1)
-     figML2.update_xaxes(constrain='domain')
-     figML2.update_layout(title_x = 0.2, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,margin=dict(l=0, r=0, t=20, b=0))
-     return figML2
-    figML2=AUC()
-    figML2
-    gc.collect()
-
-  with col2:
-   with st.container(height=350):
-    @st.cache_data(persist=True)
-    def cm():
-     cm = confusion_matrix(y_test, y_pred)
-     figML1 = px.imshow(cm,labels={"x": "Classe prédite", "y": "Classe réelle"},width=800,height=800,text_auto=True)
-     figML1.update_layout(title='Matrice de confusion',title_x = 0.35, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=1,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-     family="Arial",size=15,color="black")),margin=dict(l=0, r=0, t=2, b=0))
-     figML1.update_traces(dict(showscale=False,coloraxis=None), selector={'type':'heatmap'})
-     return figML1
-    figML1=cm()
-    figML1 
-    gc.collect()
-
-   with col1 : 
+  if st.checkbox('Afficher la courbe ROC'):
+   with col3:
     with st.container(height=350):
-     feats1 = {}
-     for feature, importance in zip(feats.columns,model.feature_importances_):
-      feats1[feature] = importance
-     importances= pd.DataFrame.from_dict(feats1, orient='index').rename(columns={0: 'Importance'})
-     importances.sort_values(by='Importance', ascending=False).head(8)
-     fig = px.bar(importances, x='Importance', y=importances.index)
-     fig.update_layout(title='Features Importance',title_x = 0.4, title_y = 0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-     family="Arial",size=15,color="black")),margin=dict(l=0, r=0, t=50, b=0),titlefont=dict(size=15))
-     st.plotly_chart(fig) 
-     gc.collect()
+     @st.cache_data(persist=True)
+     def AUC():      
+      precision, recall, thresholds = precision_recall_curve(y_test, y_pred)
+      fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+      roc_auc = auc(fpr, tpr)
+      figML2 = px.area(x=fpr, y=tpr,title=f'Courbe ROC (AUC={auc(fpr, tpr):.4f})',labels=dict(x='Taux faux positifs', y='Taux vrais positifs'))
+      figML2.add_shape(type='line', line=dict(dash='dash'),x0=0, x1=1, y0=0, y1=1)
+      figML2.update_yaxes(scaleanchor="x", scaleratio=1)
+      figML2.update_xaxes(constrain='domain')
+      figML2.update_layout(title_x = 0.2, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,margin=dict(l=0, r=0, t=20, b=0))
+      return figML2
+     figML2=AUC()
+     figML2
+  if st.checkbox("Afficher la matrice de confusion"):
+   with col2:
+    with st.container(height=350):
+     @st.cache_data(persist=True)
+     def cm():
+      cm = confusion_matrix(y_test, y_pred)
+      figML1 = px.imshow(cm,labels={"x": "Classe prédite", "y": "Classe réelle"},width=800,height=800,text_auto=True)
+      figML1.update_layout(title='Matrice de confusion',title_x = 0.35, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=1,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+      family="Arial",size=15,color="black")),margin=dict(l=0, r=0, t=2, b=0))
+      figML1.update_traces(dict(showscale=False,coloraxis=None), selector={'type':'heatmap'})
+      return figML1
+     figML1=cm()
+     figML1 
+  if st.checkbox("Afficher Features Importance"):
+    with col1 : 
+     with st.container(height=350):
+      feats1 = {}
+      for feature, importance in zip(feats.columns,model.feature_importances_):
+       feats1[feature] = importance
+      importances= pd.DataFrame.from_dict(feats1, orient='index').rename(columns={0: 'Importance'})
+      importances.sort_values(by='Importance', ascending=False).head(8)
+      fig = px.bar(importances, x='Importance', y=importances.index)
+      fig.update_layout(title='Features Importance',title_x = 0.4, title_y = 0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+      family="Arial",size=15,color="black")),margin=dict(l=0, r=0, t=50, b=0),titlefont=dict(size=15))
+      st.plotly_chart(fig) 
 
-  st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue") 
-#  col1, col2 = st.columns([0.55,0.45],gap="small",vertical_alignment="center")
-#  with col1 :
-#   with st.container(height=350):
-#    for i in range(0,len(Fires_class_pred)):    
-#     if Fires_class_pred[prediction][0] == 'Petite Classe':
-#      color = 'darkblue'
-#     elif Fires_class_pred[prediction][0] == 'Grande Classe':
-#      color = 'red'
-#     else:
-#      color = 'gray' 
-#     html = df_prediction_proba.to_html(classes="table table-striped table-hover table-condensed table-responsive")
-#     popup2 = folium.Popup(html)
-#     m = folium.Map(location=[30, -65.844032],zoom_start=3,tiles='http://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
-#           attr="Sources: National Geographic, Esri, Garmin, HERE, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, INCREMENT P")  
-#     folium.Marker([LAT, LONG],popup=popup2,icon=folium.Icon(color=color, icon='fire', prefix='fa')).add_to(m)
-#    st_data = st_folium(m,width=800,returned_objects=[])
-#  with col2 :
-#   st.info('Cliquer sur le point localisé sur la carte pour afficher les probabilités de chaque classe',icon="ℹ️",)
-#   st.markdown("")
-#   st.markdown("Légende :")
-#  col1, col2 = st.columns([0.15,0.85],gap="small",vertical_alignment="center")
-#   with col1:
-#   st.image("feu_bleu.jpg",width=40)
-#   with col2:
-#    st.markdown(":blue[Probabilité classe 1 < 50%]")
-#   col1, col2 = st.columns([0.15,0.85],gap="small",vertical_alignment="center")
-#   with col1:
-#    st.image("feu_rouge.jpg",width=40)
-#   with col2:
-#    st.markdown(":red[Probabilité classe 1 > 50%]")
+
+  st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue")
+  # Function to generate the map
+  @st.cache_data(ttl=1200)
+  def generate_map(Fires_class_pred, prediction, df_prediction_proba, LAT, LONG):
+      for i in range(len(Fires_class_pred)):
+          if Fires_class_pred[prediction][0] == 'Petite Classe':
+              color = 'darkblue'
+          elif Fires_class_pred[prediction][0] == 'Grande Classe':
+              color = 'red'
+          else:
+             color = 'gray'
+      html = df_prediction_proba.to_html(classes="table table-striped table-hover table-condensed table-responsive")
+      popup2 = folium.Popup(html)
+      m = folium.Map(
+           location=[30, -65.844032],
+           zoom_start=3,
+           tiles='http://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
+           attr="Sources: National Geographic, Esri, Garmin, HERE, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, INCREMENT P"
+      )
+      folium.Marker([LAT, LONG], popup=popup2, icon=folium.Icon(color=color, icon='fire', prefix='fa')).add_to(m)
+      return m
+      gc.collect()
+
+    # Function to display the legend
+  @st.cache_data(ttl=1200)
+  def display_legend():
+       st.info('Cliquer sur le point localisé sur la carte pour afficher les probabilités de chaque classe', icon="ℹ️")
+       st.markdown("")
+       st.markdown("Légende :")
+       col1, col2 = st.columns([0.15, 0.85], gap="small", vertical_alignment="center")
+       with col1:
+           st.image("feu_bleu.jpg", width=40)
+       with col2:
+           st.markdown(":blue[Probabilité classe 1 < 50%]")
+       col1, col2 = st.columns([0.15, 0.85], gap="small", vertical_alignment="center")
+       with col1:
+           st.image("feu_rouge.jpg", width=40)
+       with col2:
+           st.markdown(":red[Probabilité classe 1 > 50%]")
+       gc.collect()
+
+# Main code
+#st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue")
+
+  if st.checkbox("Afficher la prédiction de la classe de feux"):
+        col1, col2 = st.columns([0.55, 0.45], gap="small", vertical_alignment="center")
+
+        with col1:
+            with st.container(height=350):
+                m = generate_map(Fires_class_pred, prediction, df_prediction_proba, LAT, LONG)
+                st_data = st_folium(m, width=800, returned_objects=[], key="map")
+                gc.collect()
+
+        with col2:
+            display_legend()
+            gc.collect() 
  
+
  if classifier == "BalancedRandomForest":
-   #dict_weights = {0:1, 1: 1.2933}
-   #model3=BalancedRandomForestClassifier(sampling_strategy="not minority", replacement=True,random_state=200,n_estimators=400,class_weight=dict_weights).fit(X_train,y_train)
-   #joblib.dump(model3, "model3.joblib")
+  #dict_weights = {0:1, 1: 1.2933}
+  #model3=BalancedRandomForestClassifier(sampling_strategy="not minority", replacement=True,random_state=200,n_estimators=400,class_weight=dict_weights).fit(X_train,y_train)
+  #joblib.dump(model3, "model3.joblib")
   model3 = joblib.load("model3.joblib")
   y_pred=model3.predict(X_test)
   prediction=model3.predict(df_fires_encoded[:1])
@@ -1415,97 +1536,123 @@ if page == pages[4] :
   df_prediction_proba.columns=['Petite Classe','Grande Classe']
   df_prediction_proba.rename(columns={0:"Petite Classe",1:"Grande Classe"})
   Fires_class_pred=np.array(['Petite Classe','Grande Classe'])   
+
   st.subheader("Importance features et performance du modèle Balanced Random Forest", divider="blue")
   st.write("Accuracy",round(model3.score(X_test,y_test),4))
   st.write("Recall",round(recall_score(y_test,y_pred),4))
-  gc.collect()
-
-  col1, col2,col3 = st.columns(3,gap="small",vertical_alignment="center")
-  with col3:
-   with st.container(height=350):
-        @st.cache_data(persist=True, ttl=1200)
-        def ROCAUC():
-         precision, recall, thresholds = precision_recall_curve(y_test, y_pred)
-         fpr, tpr, thresholds = roc_curve(y_test, y_pred)
-         roc_auc = auc(fpr, tpr)
-         figML2 = px.area(x=fpr, y=tpr,title=f'Courbe ROC (AUC={auc(fpr, tpr):.4f})',labels=dict(x='Taux faux positifs', y='Taux vrais positifs'))
-         figML2.add_shape(type='line', line=dict(dash='dash'),x0=0, x1=1, y0=0, y1=1)
-         figML2.update_yaxes(scaleanchor="x", scaleratio=1)
-         figML2.update_xaxes(constrain='domain')
-         figML2.update_layout(title_x = 0.2, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,margin=dict(l=0, r=0, t=20, b=0))
-         return figML2
-        figML2=ROCAUC()
-        figML2
-        gc.collect()
-
-   with col2:
+  col1, col2, col3 = st.columns(3,gap="small",vertical_alignment="center")
+ 
+  if st.checkbox('Afficher la courbe ROCAUC'):
+   with col3:
     with st.container(height=350):
-     @st.cache_data(persist=True, ttl=1200)
-     def MatriceConfusion():
-      cm = confusion_matrix(y_test, y_pred)
-      smallest_number = cm.min()
-      largest_number = cm.max()
-      #colors = [(0, negative_color),(0.5, zero_color),(1, positive_color)]# Normalize the midpoint value to 0.5
-      figML1 = px.imshow(cm,labels={"x": "Classe prédite", "y": "Classe réelle"},width=800,height=800,text_auto=True)#color_continuous_scale='hot'
-      figML1.update_layout(title='Matrice de confusion',title_x = 0.35, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=1,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-      family="Arial",size=15,color="black")),margin=dict(l=0, r=0, t=2, b=0))
-      figML1.update_traces(dict(showscale=False,coloraxis=None), selector={'type':'heatmap'})
-      return figML1
-     figML1=MatriceConfusion()
-     figML1
-     gc.collect()
+         @st.cache_data(ttl=1200)
+         def ROCAUC():
+          precision, recall, thresholds = precision_recall_curve(y_test, y_pred)
+          fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+          roc_auc = auc(fpr, tpr)
+          figML2 = px.area(x=fpr, y=tpr,title=f'Courbe ROC (AUC={auc(fpr, tpr):.4f})',labels=dict(x='Taux faux positifs', y='Taux vrais positifs'))
+          figML2.add_shape(type='line', line=dict(dash='dash'),x0=0, x1=1, y0=0, y1=1)
+          figML2.update_yaxes(scaleanchor="x", scaleratio=1)
+          figML2.update_xaxes(constrain='domain')
+          figML2.update_layout(title_x = 0.2, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,margin=dict(l=0, r=0, t=20, b=0))
+          return figML2
+         figML2=ROCAUC()
+         figML2
+         gc.collect()
 
-   with col1 : 
-    with st.container(height=350):
-     @st.cache_data(persist=True, ttl=1200)
-     def FeatureImportance():    
-        feats2 = {}
-        for feature, importance in zip(feats.columns,model3.feature_importances_):
-            feats2[feature] = importance
-        importances2= pd.DataFrame.from_dict(feats2, orient='index').rename(columns={0: 'Importance'})
-        importances2.sort_values(by='Importance', ascending=False).head(8)    
-        figML3 = px.bar(importances2, x='Importance', y=importances2.index)
-        figML3.update_layout(title='Feature Importance',title_x = 0.4, title_y = 0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-        family="Arial",size=15,color="black")),margin=dict(l=0, r=0, t=50, b=0),titlefont=dict(size=15))
-        return figML3
-     figML3=FeatureImportance()
-     figML3
-     gc.collect()
+  if st.checkbox("Afficher la matrice de confusion"):
+    with col2:
+     with st.container(height=350):
+      @st.cache_data(ttl=1200)
+      def MatriceConfusion():
+       cm = confusion_matrix(y_test, y_pred)
+       smallest_number = cm.min()
+       largest_number = cm.max()
+       #colors = [(0, negative_color),(0.5, zero_color),(1, positive_color)]# Normalize the midpoint value to 0.5
+       figML1 = px.imshow(cm,labels={"x": "Classe prédite", "y": "Classe réelle"},width=800,height=800,text_auto=True)#color_continuous_scale='hot'
+       figML1.update_layout(title='Matrice de confusion',title_x = 0.35, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=1,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+       family="Arial",size=15,color="white")),margin=dict(l=0, r=0, t=2, b=0))
+       figML1.update_traces(dict(showscale=False,coloraxis=None), selector={'type':'heatmap'})
+       return figML1
+      figML1=MatriceConfusion()
+      figML1
+      gc.collect()
+
+  if st.checkbox("Afficher Features Importance"):
+    with col1 : 
+     with st.container(height=350):
+      @st.cache_data(ttl=1200)
+      def FeatureImportance():    
+         feats2 = {}
+         for feature, importance in zip(feats.columns,model3.feature_importances_):
+             feats2[feature] = importance
+         importances2= pd.DataFrame.from_dict(feats2, orient='index').rename(columns={0: 'Importance'})
+         importances2.sort_values(by='Importance', ascending=False).head(8)    
+         figML3 = px.bar(importances2, x='Importance', y=importances2.index)
+         figML3.update_layout(title='Features Importance',title_x = 0.4, title_y = 0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+         family="Arial",size=15,color="white")),margin=dict(l=0, r=0, t=50, b=0),titlefont=dict(size=15))
+         return figML3
+      figML3=FeatureImportance()
+      figML3
+      gc.collect()
 
   st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue")
-  col1, col2 = st.columns([0.55,0.45],gap="small",vertical_alignment="center")
-  with col1 :
-    with st.container(height=350):
-     for i in range(0,len(Fires_class_pred)):    
-      if Fires_class_pred[prediction][0] == 'Petite Classe':
-       color = 'darkblue'
-      elif Fires_class_pred[prediction][0] == 'Grande Classe':
-       color = 'red'
-      else:
-       color = 'gray'
-     html = df_prediction_proba.to_html(classes="table table-striped table-hover table-condensed table-responsive")
-     popup2 = folium.Popup(html)
-     m = folium.Map(location=[30, -65.844032],zoom_start=3,tiles='http://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
-           attr="Sources: National Geographic, Esri, Garmin, HERE, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, INCREMENT P")  
-     folium.Marker([LAT, LONG],popup=popup2,icon=folium.Icon(color=color, icon='fire', prefix='fa')).add_to(m)
-     st_data = st_folium(m,width=800,returned_objects=[])
-     gc.collect()
+  # Function to generate the map
+  @st.cache_data(ttl=1200)
+  def generate_map(Fires_class_pred, prediction, df_prediction_proba, LAT, LONG):
+      for i in range(len(Fires_class_pred)):
+          if Fires_class_pred[prediction][0] == 'Petite Classe':
+              color = 'darkblue'
+          elif Fires_class_pred[prediction][0] == 'Grande Classe':
+              color = 'red'
+          else:
+              color = 'gray'
+      html = df_prediction_proba.to_html(classes="table table-striped table-hover table-condensed table-responsive")
+      popup2 = folium.Popup(html)
+      m = folium.Map(
+          location=[30, -65.844032],
+          zoom_start=3,
+          tiles='http://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
+          attr="Sources: National Geographic, Esri, Garmin, HERE, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, INCREMENT P"
+      )
+      folium.Marker([LAT, LONG], popup=popup2, icon=folium.Icon(color=color, icon='fire', prefix='fa')).add_to(m)
+      return m
+      gc.collect()
 
-  with col2 :
-    st.info('Cliquer sur le point localisé sur la carte pour afficher les probabilités de chaque classe',icon="ℹ️",)
-    st.markdown("")
-    st.markdown("Légende :")
-    col1, col2 = st.columns([0.15,0.85],gap="small",vertical_alignment="center")
-    with col1:
-     st.image("feu_bleu.jpg",width=40)
-    with col2:
-     st.markdown(":blue[Probabilité classe 1 < 50%]")
-    col1, col2 = st.columns([0.15,0.85],gap="small",vertical_alignment="center")
-    with col1:
-     st.image("feu_rouge.jpg",width=40)
-    with col2:
-     st.markdown(":red[Probabilité classe 1 > 50%]")
+  # Function to display the legend
+  @st.cache_data(ttl=1200)
+  def display_legend():
+      st.info('Cliquer sur le point localisé sur la carte pour afficher les probabilités de chaque classe', icon="ℹ️")
+      st.markdown("")
+      st.markdown("Légende :")
+      col1, col2 = st.columns([0.15, 0.85], gap="small", vertical_alignment="center")
+      with col1:
+          st.image("feu_bleu.jpg", width=40)
+      with col2:
+          st.markdown(":blue[Probabilité classe 1 < 50%]")
+      col1, col2 = st.columns([0.15, 0.85], gap="small", vertical_alignment="center")
+      with col1:
+          st.image("feu_rouge.jpg", width=40)
+      with col2:
+          st.markdown(":red[Probabilité classe 1 > 50%]")
+      gc.collect()
 
+# Main code
+#st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue")
+
+  if st.checkbox("Afficher la prédiction de la classe de feux"):
+      col1, col2 = st.columns([0.55, 0.45], gap="small", vertical_alignment="center")
+
+      with col1:
+          with st.container(height=350):
+              m = generate_map(Fires_class_pred, prediction, df_prediction_proba, LAT, LONG)
+              st_data = st_folium(m, width=800, returned_objects=[], key="map")
+              gc.collect()
+
+      with col2:
+          display_legend()
+          gc.collect() 
+ 
 # Conclusion
 if page == pages[5] : 
   st.write("### Conclusion et propositions d’optimisation")
