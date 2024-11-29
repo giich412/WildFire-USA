@@ -7,4 +7,5 @@ seaborn
 streamlit==1.40.1
 xgboost
 folium
+streamlit-folium
 requests
