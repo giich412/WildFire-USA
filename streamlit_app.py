@@ -158,13 +158,13 @@ st.markdown(
 
 
 #Chargement dataframe sous alias df
-@st.cache_resource
+@st.cache_data(ttl=1200)                          #cache_resource
 def load_data():
-  data=pd.read_csv('Firesclean.csv', index_col=0)
+  data=pd.read_csv('Firesclean_2.csv', index_col=0)  #'Firesclean_2.csv'
   # Scale down to 10 percent of the dataset
   data_sampled = data.sample(frac=0.1, random_state=42)
   return data_sampled
-  #return data
+  return data
 df=load_data()
 
 st.sidebar.title("Sommaire")
@@ -583,7 +583,7 @@ elif page == pages[2] :
 #        #joblib.dump(st.plotly_chart(fig7),"répartition_géo")
 
 #        with col2:
-        @st.cache_data(persist=True)
+        @st.cache_data(ttl=1200)
         def scatter_geo():
             fig7_ = px.scatter_geo(FiresClasse,
                 lon = FiresClasse['LONGITUDE'],
@@ -669,7 +669,20 @@ if page == pages[3] :
   # Sauvegarde des 200 dernières lignes du jeu pour la validation finale et l'interactivité
   Fires_test2 = Fires_ML.iloc[-200:, :]
   Fires_ML = Fires_ML.iloc[:-200, :]
+  #gc.collect()
+
+  # Check shapes and indices
+  print("Fires_ML shape after preprocessing:", Fires_ML.shape)
+  print("Fires_test2 shape:", Fires_test2.shape)
+  print("Fires_ML indices:", Fires_ML.index)
+  print("Fires_test2 indices:", Fires_test2.index)
+
+  # Verify no NaN values
+  assert not Fires_ML.isnull().values.any(), "Fires_ML contains NaN values"
+  assert not Fires_test2.isnull().values.any(), "Fires_test2 contains NaN values"
+
   gc.collect()
+
 
   st.subheader("Regroupement des causes 🗂️", divider="blue") 
   if st.checkbox("Cliquez pour voir les causes de feux"):
@@ -763,14 +776,14 @@ if page == pages[3] :
   def cyclic_transform(X):
     # Séparation des variables suivant leur type
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
-    circular_data = X[circular_cols_init]
+    circular_data = X[circular_cols_init].copy()
     # Encodage des variables temporelles cycliques
-    circular_data.loc["SIN_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.sin(2*np.pi*m/12))
-    circular_data.loc["COS_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.cos(2*np.pi*m/12))
-    circular_data.loc["SIN_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.sin(2*np.pi*w/53))
-    circular_data.loc["COS_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.cos(2*np.pi*w/53))
-    circular_data.loc["SIN_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2*np.pi*d/7))
-    circular_data.loc["COS_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2*np.pi*d/7))
+    circular_data["SIN_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.sin(2*np.pi*m/12))     #.loc
+    circular_data["COS_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.cos(2*np.pi*m/12))
+    circular_data["SIN_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.sin(2*np.pi*w/53))
+    circular_data["COS_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.cos(2*np.pi*w/53))
+    circular_data["SIN_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2*np.pi*d/7))
+    circular_data["COS_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2*np.pi*d/7))
     # Suppression des variables cycliques sources pour éviter le doublon d'informations
     circular_data = circular_data.drop(circular_cols_init, axis = 1).reset_index(drop = True)
     # Récupération des noms de colonnes des nouvelles variables
@@ -784,7 +797,7 @@ if page == pages[3] :
   def num_imputer(X):
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
     num_cols = feats.drop(circular_cols_init, axis = 1).columns
-    X_num = X[num_cols]
+    X_num = X[num_cols].copy()
     # Instanciation de la méthode SimpleImputer
     numeric_imputer = SimpleImputer(strategy = "median")
     # Initialisation des variables
@@ -792,17 +805,18 @@ if page == pages[3] :
              "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
     sub_col = ["DURATION","FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", 
                "FIRE_SIZE_CLASS_E", "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
-    sub_num_data = X_num[sub_col]
-    num_data = sub_num_data
+    sub_num_data = X_num[sub_col].copy()
+    num_data = sub_num_data.copy()
     for fire_class in CLASS:
         num_imputed = numeric_imputer.fit_transform(sub_num_data[sub_num_data[fire_class] == 1])
-        num_data.loc[num_data[fire_class] == 1] = num_imputed
-    X_num.loc["DURATION"] = num_data["DURATION"]
+        num_data[num_data[fire_class] == 1] = num_imputed  #.loc
+    X_num["DURATION"] = num_data["DURATION"] #.loc
     X_num = X_num.reset_index(drop = True)
     return X_num
-  gc.collect()
+
   num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
   gc.collect()
+
   # Reconstitution du jeu de données après traitement
   @st.cache_data(ttl=1200)
   def X_concat(X_train_num, X_test_num, circular_train, circular_test):
@@ -817,6 +831,47 @@ if page == pages[3] :
   X_train_final, X_test_final, overall_col = X_concat(num_train_imputed, num_test_imputed, circular_train, circular_test)
   gc.collect()
 
+#  @st.cache_resource
+#  def model_reduction(classifier, X_train, y_train):
+#    # Check Data Shapes
+#    print("X_train shape:", X_train.shape)
+#    print("y_train shape:", y_train.shape)
+    
+    # Verify Data Integrity
+#    assert not X_train.isnull().values.any(), "X_train contains NaN values"
+#    assert not y_train.isnull().values.any(), "y_train contains NaN values"
+    
+    # Align Indices
+#    X_train = X_train.reset_index(drop=True)
+#    y_train = y_train.reset_index(drop=True)
+    
+#    if classifier == "XGBoost":
+#        clf = XGBClassifier(tree_method="approx", objective="multi:softprob").fit(X_train.head(1000), y_train.head(1000))
+#        feat_imp_data = pd.DataFrame(list(clf.get_booster().get_fscore().items()),
+#                                     columns=["feature", "importance"]).sort_values('importance', ascending=True)
+#        fea#t_imp = list(feat_imp_data["feature"][-11:])
+#    elif classifier == "Regression Logistique":
+#        clf = LogisticRegression(random_state=42, max_iter=1000).fit(X_train, y_train)
+#        coefficients = clf.coef_
+#        avg_importance = np.mean(np.abs(coefficients), axis=0)
+#        feat_imp_data = pd.DataFrame({"feature": X_train.columns, "importance": avg_importance}).sort_values('importance', ascending=True)
+#        feat_imp = list(feat_imp_data["feature"][-11:])
+#    elif classifier == "Arbre de Décision":
+#        clf = DecisionTreeClassifier(criterion="gini", random_state=42).fit(X_train, y_train)
+#        feat_imp_data = pd.DataFrame(clf.feature_importances_,
+#                                     index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
+#        feat_imp = list(feat_imp_data.index[-11:])
+    
+#    return feat_imp
+
+#gc.collect()
+
+# Example usage (assuming X_train_final and y_train are defined)
+# feat_imp = model_reduction("XGBoost", X_train_final, y_train)
+
+
+
+
   # Réduction du modèle avec la méthode feature importances
   @st.cache_resource
   def model_reduction(classifier, X_train, y_train):
@@ -826,11 +881,11 @@ if page == pages[3] :
        feat_imp_data = pd.DataFrame(list(clf.get_booster().get_fscore().items()),
                                     columns=["feature", "importance"]).sort_values('importance', ascending=True)
        feat_imp = list(feat_imp_data["feature"][-11:])
-    elif classifier == "Random Forest":
-       clf = RandomForestClassifier().fit(X_train, y_train)
-       feat_imp_data = pd.DataFrame(clf.feature_importances_,
-                                    index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
-       feat_imp = list(feat_imp_data.index[-11:])
+    #elif classifier == "Random Forest":
+    #   clf = RandomForestClassifier().fit(X_train, y_train)
+    #   feat_imp_data = pd.DataFrame(clf.feature_importances_,
+    #                                index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
+    #   feat_imp = list(feat_imp_data.index[-11:])
     elif classifier == "Regression Logistique":
        clf = LogisticRegression(random_state = 42, max_iter=1000).fit(X_train, y_train)
        coefficients = clf.coef_
@@ -899,18 +954,18 @@ if page == pages[3] :
   gc.collect()
 
   # Best xgb raw model
-  @st.cache_resource
-  def best_rf_raw_model(X, y):
-     rf_best_params = {"n_estimators": 50,
-                      "max_depth": 100,
-                      "min_samples_leaf": 40,
-                      "min_samples_split": 50,
-                      "max_features": 'sqrt'}
-     clf_rf = RandomForestClassifier(**rf_best_params).fit(X, y)
-     joblib.dump(clf_rf, "best_rf_raw_model.joblib")
-     model = joblib.load("best_rf_raw_model.joblib")
-     return model
-  gc.collect()
+  #@st.cache_resource
+  #def best_rf_raw_model(X, y):
+  #   rf_best_params = {"n_estimators": 50,
+  #                    "max_depth": 100,
+  #                    "min_samples_leaf": 40,
+  #                    "min_samples_split": 50,
+  #                    "max_features": 'sqrt'}
+  #   clf_rf = RandomForestClassifier(**rf_best_params).fit(X, y)
+  #   joblib.dump(clf_rf, "best_rf_raw_model.joblib")
+  #   model = joblib.load("best_rf_raw_model.joblib")
+  #   return model
+  #   gc.collect()
 
   # Best LogReg raw model
   @st.cache_resource
@@ -922,7 +977,7 @@ if page == pages[3] :
      joblib.dump(clf_LogReg, "best_lr_raw_model.joblib")
      model = joblib.load("best_lr_raw_model.joblib")
      return model
-  gc.collect()
+     gc.collect()
 
   # Best Decision Tree raw model
   @st.cache_resource
@@ -932,7 +987,7 @@ if page == pages[3] :
      joblib.dump(clf_DecTree, "best_DecTree_raw_model.joblib")
      model = joblib.load("best_DecTree_raw_model.joblib")
      return model
-  gc.collect()
+     gc.collect()
 
   ######################################################################################################################################################################
   ### Fonctions de labelisation de set de données fournies en input pour une prédiction en temps réelles (en phase de production) ######################################
@@ -968,7 +1023,7 @@ if page == pages[3] :
           else:
              X.loc[i, state] = 0
     return X
-  gc.collect()
+    gc.collect()
   
 
     # FIPS CODE par STATE
@@ -993,13 +1048,13 @@ if page == pages[3] :
     else:
       X_train_final, X_test_final = X_train_final, X_test_final
       st.write("Les variables ne sont pas réduites")
-  gc.collect()
+      #gc.collect()
     
     # Définition des paramètres des modèles sur l'interface streamlit
     ####################################
     ###        Modèle XGBoost        ###
     ####################################
-  if classifier == "XGBoost": 
+    if classifier == "XGBoost": 
       # Ré-équilibrage ou non des données 
       class_weights_option = st.sidebar.radio("Voulez-vous rééquilibrer les classes ?", ["Oui", "Non"], horizontal=True)
       if class_weights_option == "Oui":
@@ -1017,25 +1072,25 @@ if page == pages[3] :
     ####################################
     ###     Modèle Random Forest     ###
     ####################################
-  elif classifier == "Random Forest":
-      class_weights_option = st.sidebar.radio("Voulez-vous rééquilibrer les classes ?", ["Oui", "Non"], horizontal=True)
-      if class_weights_option == "Oui":
-          class_weights_array = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
-          classes_weights = {i: weight for i, weight in enumerate(class_weights_array)}
-          st.write("Les classes sont ré-équilibrées")
-      else:
-          classes_weights = None
-          st.write("Les classes ne sont pas ré-équilibrées.")
-      n_estimators = st.sidebar.slider("Veuillez choisir le nombre d'estimateurs", 5, 30, 10, 5)
-      max_depth = st.sidebar.slider("Veuillez choisir la profondeur de l'arbre", 3, 10)
-      min_samples_leaf = st.sidebar.slider("Veuillez choisir min_samples_leaf", 20, 60, 40, 5)
-      min_samples_split = st.sidebar.slider("Veuillez choisir min_samples_split", 30, 100, 100, 5)      
-      max_features = st.sidebar.radio("Veuillez choisir le nombre de features", ("sqrt", "log2"), horizontal=True)
-      gc.collect()
+#elif classifier == "Random Forest":
+#      class_weights_option = st.sidebar.radio("Voulez-vous rééquilibrer les classes ?", ["Oui", "Non"], horizontal=True)
+#      if class_weights_option == "Oui":
+#          class_weights_array = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
+#          classes_weights = {i: weight for i, weight in enumerate(class_weights_array)}
+#          st.write("Les classes sont ré-équilibrées")
+#      else:
+#          classes_weights = None
+#          st.write("Les classes ne sont pas ré-équilibrées.")
+#      n_estimators = st.sidebar.slider("Veuillez choisir le nombre d'estimateurs", 5, 30, 10, 5)
+#      max_depth = st.sidebar.slider("Veuillez choisir la profondeur de l'arbre", 3, 10)
+#      min_samples_leaf = st.sidebar.slider("Veuillez choisir min_samples_leaf", 20, 60, 40, 5)
+#      min_samples_split = st.sidebar.slider("Veuillez choisir min_samples_split", 30, 100, 100, 5)      
+#      max_features = st.sidebar.radio("Veuillez choisir le nombre de features", ("sqrt", "log2"), horizontal=True)
+#      gc.collect()
     ####################################
     ### Modèle Regression Logistique ###
     ####################################
-  elif classifier == "Regression Logistique":
+    elif classifier == "Regression Logistique":
       class_weights_option = st.sidebar.radio("Voulez-vous rééquilibrer les classes ?", ["Oui", "Non"], horizontal=True)
       if class_weights_option == "Oui":
          classes_weights = 'balanced'
@@ -1047,7 +1102,7 @@ if page == pages[3] :
     ####################################
     ###   Modèle Arbre de Décision   ###
     ####################################
-  elif classifier == "Arbre de Décision":
+    elif classifier == "Arbre de Décision":
       class_weights_option = st.sidebar.radio("Voulez-vous rééquilibrer les classes ?", ["Oui", "Non"], horizontal=True)
       if class_weights_option == "Oui":
          classes_weights = 'balanced'
@@ -1061,7 +1116,7 @@ if page == pages[3] :
       gc.collect()
 
     # Création d'un bouton pour le modèle avec les meilleurs paramètres
-  if st.sidebar.button("Best Model Execution"):
+    if st.sidebar.button("Best Model Execution"):
       if classifier == "XGBoost":
         st.subheader("XGBoost Result")
         best_params = {"learning_rate": 0.015, 
@@ -1079,20 +1134,20 @@ if page == pages[3] :
         model = joblib.load("clf_xgb_best_model.joblib")
         gc.collect()
 
-      elif classifier == "Random Forest":
-        st.subheader("Random Forest Result")
-        best_params = {"n_estimators": 50,
-                      "max_depth": 100,
-                      "min_samples_leaf": 40,
-                      "min_samples_split": 50,
-                      "max_features": 'sqrt'}
-        feat_imp = model_reduction(classifier, X_train_final, y_train)
-        X_train_final, X_test_final = X_train_final[feat_imp], X_test_final[feat_imp]
-        clf_rf_best = RandomForestClassifier(**best_params, class_weight='balanced').fit(X_train_final, y_train)
-        joblib.dump(clf_rf_best, "clf_rf_best_model.joblib")
+      #elif classifier == "Random Forest":
+      #  st.subheader("Random Forest Result")
+      #  best_params = {"n_estimators": 50,
+      #                "max_depth": 100,
+      #                "min_samples_leaf": 40,
+      #                "min_samples_split": 50,
+      #                "max_features": 'sqrt'}
+      #  feat_imp = model_reduction(classifier, X_train_final, y_train)
+      #  X_train_final, X_test_final = X_train_final[feat_imp], X_test_final[feat_imp]
+      #  clf_rf_best = RandomForestClassifier(**best_params, class_weight='balanced').fit(X_train_final, y_train)
+      #  joblib.dump(clf_rf_best, "clf_rf_best_model.joblib")
         # Chargement du meilleur modèle
-        model = joblib.load("clf_rf_best_model.joblib")
-        gc.collect()
+      #  model = joblib.load("clf_rf_best_model.joblib")
+      #  gc.collect()
 
       elif classifier == "Regression Logistique":
         st.subheader("Logistic Regression Result")
@@ -1114,6 +1169,7 @@ if page == pages[3] :
         clf_DecTree_best = DecisionTreeClassifier(**best_params, class_weight = "balanced", random_state = 42).fit(X_train_final, y_train)
         joblib.dump(clf_DecTree_best, "clf_DecTree_best_model.joblib")
         model = joblib.load("clf_DecTree_best_model.joblib")
+
       y_pred = model.predict(X_test_final[feat_imp])
       accuracy = model.score(X_test_final[feat_imp], y_test)
       cm = np.round(confusion_matrix(y_test, y_pred, normalize = "true"), 4)
@@ -1175,7 +1231,7 @@ if page == pages[3] :
               gc.collect()
 
     # Création d'un bouton utilisateur pour l'interactivité
-  if st.sidebar.button("User Execution", key = "classify"):
+    if st.sidebar.button("User Execution", key = "classify"):
       if classifier == "XGBoost":
         st.subheader("XGBoost User Results")
         model = XGBClassifier(n_estimators = n_estimators,
@@ -1205,7 +1261,7 @@ if page == pages[3] :
                                         min_samples_split = min_samples_split,
                                         min_samples_leaf = min_samples_leaf,
                                         class_weight = classes_weights).fit(X_train_final, y_train)
-      gc.collect()
+      #gc.collect()
       # st.write("Le score d'entrainement est :", np.round(model.score(X_train_final, y_train), 4))
       y_pred = model.predict(X_test_final)
       cm = np.round(confusion_matrix(y_test, y_pred, normalize = "true"), 4)
@@ -1275,7 +1331,7 @@ if page == pages[3] :
       # Prédiction de la cause du (des) feu(x)
       if classifier == "XGBoost":
           clf = best_xgb_raw_model(X_train_final, y_train)
-      elif classifier == "Random Forest":
+      #elif classifier == "Random Forest":
           clf = best_rf_raw_model(X_train_final, y_train)
       elif classifier == "Regression Logistique":
           clf = best_LogReg_raw_model(X_train_final, y_train)
@@ -1287,9 +1343,9 @@ if page == pages[3] :
       y_pred.loc[y_pred["FIRE CAUSE"] == 1, "FIRE CAUSE"] = "Criminelle 🦹🏻‍♂️🔥"
       y_pred.loc[y_pred["FIRE CAUSE"] == 2, "FIRE CAUSE"] = "Naturelle 🌩️"
       st.dataframe(y_pred)
-      #gc.collect()
+      gc.collect()
 
-pd.set_option('future.no_silent_downcasting', True)
+  #pd.set_option('future.no_silent_downcasting', True)
 
 # Modèles de prédiction des classes
 if page == pages[4] :  
@@ -1431,10 +1487,10 @@ if page == pages[4] :
   st.write("Recall",round(recall_score(y_test,y_pred),4))  
 
   col1, col2,col3 = st.columns(3,gap="small",vertical_alignment="center")
-  if st.checkbox('Afficher la courbe ROC'):
+  if st.checkbox('Affichage Courbe ROC'):
    with col3:
     with st.container(height=350):
-     @st.cache_data(persist=True)
+     @st.cache_data(ttl=1200)
      def AUC():      
       precision, recall, thresholds = precision_recall_curve(y_test, y_pred)
       fpr, tpr, thresholds = roc_curve(y_test, y_pred)
@@ -1447,10 +1503,10 @@ if page == pages[4] :
       return figML2
      figML2=AUC()
      figML2
-  if st.checkbox("Afficher la matrice de confusion"):
+  if st.checkbox("Affichage Matrice de Confusion"):
    with col2:
     with st.container(height=350):
-     @st.cache_data(persist=True)
+     @st.cache_data(ttl=1200)
      def cm():
       cm = confusion_matrix(y_test, y_pred)
       figML1 = px.imshow(cm,labels={"x": "Classe prédite", "y": "Classe réelle"},width=800,height=800,text_auto=True)
@@ -1460,7 +1516,7 @@ if page == pages[4] :
       return figML1
      figML1=cm()
      figML1 
-  if st.checkbox("Afficher Features Importance"):
+  if st.checkbox("AAffichage Features Importance"):
     with col1 : 
      with st.container(height=350):
       feats1 = {}
@@ -1518,7 +1574,7 @@ if page == pages[4] :
 # Main code
 #st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue")
 
-  if st.checkbox("Afficher la prédiction de la classe de feux"):
+  if st.checkbox("Affichage Prédiction de la Classe de Feux"):
         col1, col2 = st.columns([0.55, 0.45], gap="small", vertical_alignment="center")
 
         with col1:
@@ -1532,134 +1588,134 @@ if page == pages[4] :
             gc.collect() 
  
 
- if classifier == "BalancedRandomForest":
-  #dict_weights = {0:1, 1: 1.2933}
-  #model3=BalancedRandomForestClassifier(sampling_strategy="not minority", replacement=True,random_state=200,n_estimators=400,class_weight=dict_weights).fit(X_train,y_train)
-  #joblib.dump(model3, "model3.joblib")
-  model3 = joblib.load("model3.joblib")
-  y_pred=model3.predict(X_test)
-  prediction=model3.predict(df_fires_encoded[:1])
-  prediction_proba=model3.predict_proba(df_fires_encoded[:1])
-  df_prediction_proba=pd.DataFrame(prediction_proba)
-  df_prediction_proba.columns=['Petite Classe','Grande Classe']
-  df_prediction_proba.rename(columns={0:"Petite Classe",1:"Grande Classe"})
-  Fires_class_pred=np.array(['Petite Classe','Grande Classe'])   
+# if classifier == "BalancedRandomForest":
+#  #dict_weights = {0:1, 1: 1.2933}
+#  #model3=BalancedRandomForestClassifier(sampling_strategy="not minority", replacement=True,random_state=200,n_estimators=400,class_weight=dict_weights).fit(X_train,y_train)
+#  #joblib.dump(model3, "model3.joblib")
+#  model3 = joblib.load("model3.joblib")
+#  y_pred=model3.predict(X_test)
+#  prediction=model3.predict(df_fires_encoded[:1])
+#  prediction_proba=model3.predict_proba(df_fires_encoded[:1])
+#  df_prediction_proba=pd.DataFrame(prediction_proba)
+#  df_prediction_proba.columns=['Petite Classe','Grande Classe']
+#  df_prediction_proba.rename(columns={0:"Petite Classe",1:"Grande Classe"})
+#  Fires_class_pred=np.array(['Petite Classe','Grande Classe'])   
 
-  st.subheader("Importance features et performance du modèle Balanced Random Forest", divider="blue")
-  st.write("Accuracy",round(model3.score(X_test,y_test),4))
-  st.write("Recall",round(recall_score(y_test,y_pred),4))
-  col1, col2, col3 = st.columns(3,gap="small",vertical_alignment="center")
+#  st.subheader("Importance features et performance du modèle Balanced Random Forest", divider="blue")
+#  st.write("Accuracy",round(model3.score(X_test,y_test),4))
+#  st.write("Recall",round(recall_score(y_test,y_pred),4))
+#  col1, col2, col3 = st.columns(3,gap="small",vertical_alignment="center")
  
-  if st.checkbox('Afficher la courbe ROCAUC'):
-   with col3:
-    with st.container(height=350):
-         @st.cache_data(ttl=1200)
-         def ROCAUC():
-          precision, recall, thresholds = precision_recall_curve(y_test, y_pred)
-          fpr, tpr, thresholds = roc_curve(y_test, y_pred)
-          roc_auc = auc(fpr, tpr)
-          figML2 = px.area(x=fpr, y=tpr,title=f'Courbe ROC (AUC={auc(fpr, tpr):.4f})',labels=dict(x='Taux faux positifs', y='Taux vrais positifs'))
-          figML2.add_shape(type='line', line=dict(dash='dash'),x0=0, x1=1, y0=0, y1=1)
-          figML2.update_yaxes(scaleanchor="x", scaleratio=1)
-          figML2.update_xaxes(constrain='domain')
-          figML2.update_layout(title_x = 0.2, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,margin=dict(l=0, r=0, t=20, b=0))
-          return figML2
-         figML2=ROCAUC()
-         figML2
-         gc.collect()
+#  if st.checkbox('Afficher la courbe ROCAUC'):
+#   with col3:
+#    with st.container(height=350):
+#         @st.cache_data(ttl=1200)
+#         def ROCAUC():
+#          precision, recall, thresholds = precision_recall_curve(y_test, y_pred)
+#          fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+#          roc_auc = auc(fpr, tpr)
+#          figML2 = px.area(x=fpr, y=tpr,title=f'Courbe ROC (AUC={auc(fpr, tpr):.4f})',labels=dict(x='Taux faux positifs', y='Taux vrais positifs'))
+#          figML2.add_shape(type='line', line=dict(dash='dash'),x0=0, x1=1, y0=0, y1=1)
+#          figML2.update_yaxes(scaleanchor="x", scaleratio=1)
+#          figML2.update_xaxes(constrain='domain')
+#          figML2.update_layout(title_x = 0.2, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,margin=dict(l=0, r=0, t=20, b=0))
+#          return figML2
+#         figML2=ROCAUC()
+#         figML2
+#         gc.collect()
 
-  if st.checkbox("Afficher la matrice de confusion"):
-    with col2:
-     with st.container(height=350):
-      @st.cache_data(ttl=1200)
-      def MatriceConfusion():
-       cm = confusion_matrix(y_test, y_pred)
-       smallest_number = cm.min()
-       largest_number = cm.max()
-       #colors = [(0, negative_color),(0.5, zero_color),(1, positive_color)]# Normalize the midpoint value to 0.5
-       figML1 = px.imshow(cm,labels={"x": "Classe prédite", "y": "Classe réelle"},width=800,height=800,text_auto=True)#color_continuous_scale='hot'
-       figML1.update_layout(title='Matrice de confusion',title_x = 0.35, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=1,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-       family="Arial",size=15,color="white")),margin=dict(l=0, r=0, t=2, b=0))
-       figML1.update_traces(dict(showscale=False,coloraxis=None), selector={'type':'heatmap'})
-       return figML1
-      figML1=MatriceConfusion()
-      figML1
-      gc.collect()
+#  if st.checkbox("Afficher la matrice de confusion"):
+#    with col2:
+#     with st.container(height=350):
+#      @st.cache_data(ttl=1200)
+#      def MatriceConfusion():
+#       cm = confusion_matrix(y_test, y_pred)
+#       smallest_number = cm.min()
+#      #largest_number = cm.max()
+#      #colors = [(0, negative_color),(0.5, zero_color),(1, positive_color)]# Normalize the midpoint value to 0.5
+#       figML1 = px.imshow(cm,labels={"x": "Classe prédite", "y": "Classe réelle"},width=800,height=800,text_auto=True)#color_continuous_scale='hot'
+#       figML1.update_layout(title='Matrice de confusion',title_x = 0.35, title_y =0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=1,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+#       family="Arial",size=15,color="white")),margin=dict(l=0, r=0, t=2, b=0))
+#       figML1.update_traces(dict(showscale=False,coloraxis=None), selector={'type':'heatmap'})
+#       return figML1
+#      figML1=MatriceConfusion()
+#      figML1
+#      gc.collect()
 
-  if st.checkbox("Afficher Features Importance"):
-    with col1 : 
-     with st.container(height=350):
-      @st.cache_data(ttl=1200)
-      def FeatureImportance():    
-         feats2 = {}
-         for feature, importance in zip(feats.columns,model3.feature_importances_):
-             feats2[feature] = importance
-         importances2= pd.DataFrame.from_dict(feats2, orient='index').rename(columns={0: 'Importance'})
-         importances2.sort_values(by='Importance', ascending=False).head(8)    
-         figML3 = px.bar(importances2, x='Importance', y=importances2.index)
-         figML3.update_layout(title='Features Importance',title_x = 0.4, title_y = 0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
-         family="Arial",size=15,color="white")),margin=dict(l=0, r=0, t=50, b=0),titlefont=dict(size=15))
-         return figML3
-      figML3=FeatureImportance()
-      figML3
-      gc.collect()
+#  if st.checkbox("Afficher Features Importance"):
+#    with col1 : 
+#     with st.container(height=350):
+#      @st.cache_data(ttl=1200)
+#      def FeatureImportance():    
+#         feats2 = {}
+#         for feature, importance in zip(feats.columns,model3.feature_importances_):
+#             feats2[feature] = importance
+#         importances2= pd.DataFrame.from_dict(feats2, orient='index').rename(columns={0: 'Importance'})
+#         importances2.sort_values(by='Importance', ascending=False).head(8)    
+#         figML3 = px.bar(importances2, x='Importance', y=importances2.index)
+#         figML3.update_layout(title='Features Importance',title_x = 0.4, title_y = 0.98,paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',width=900, height=320,legend=dict(x=0.5, y=0.93,orientation="h",xanchor="center",yanchor="bottom",font=dict(
+#         family="Arial",size=15,color="white")),margin=dict(l=0, r=0, t=50, b=0),titlefont=dict(size=15))
+#         return figML3
+#      figML3=FeatureImportance()
+#      figML3
+#      gc.collect()
 
-  st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue")
+#  st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue")
   # Function to generate the map
-  @st.cache_data(ttl=1200)
-  def generate_map(Fires_class_pred, prediction, df_prediction_proba, LAT, LONG):
-      for i in range(len(Fires_class_pred)):
-          if Fires_class_pred[prediction][0] == 'Petite Classe':
-              color = 'darkblue'
-          elif Fires_class_pred[prediction][0] == 'Grande Classe':
-              color = 'red'
-          else:
-              color = 'gray'
-      html = df_prediction_proba.to_html(classes="table table-striped table-hover table-condensed table-responsive")
-      popup2 = folium.Popup(html)
-      m = folium.Map(
-          location=[30, -65.844032],
-          zoom_start=3,
-          tiles='http://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
-          attr="Sources: National Geographic, Esri, Garmin, HERE, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, INCREMENT P"
-      )
-      folium.Marker([LAT, LONG], popup=popup2, icon=folium.Icon(color=color, icon='fire', prefix='fa')).add_to(m)
-      return m
-      gc.collect()
+#  @st.cache_data(ttl=1200)
+#  def generate_map(Fires_class_pred, prediction, df_prediction_proba, LAT, LONG):
+#      for i in range(len(Fires_class_pred)):
+#          if Fires_class_pred[prediction][0] == 'Petite Classe':
+#              color = 'darkblue'
+#          elif Fires_class_pred[prediction][0] == 'Grande Classe':
+#              color = 'red'
+#          else:
+#              color = 'gray'
+#      html = df_prediction_proba.to_html(classes="table table-striped table-hover table-condensed table-responsive")
+#      popup2 = folium.Popup(html)
+#      m = folium.Map(
+#          location=[30, -65.844032],
+#          zoom_start=3,
+#          tiles='http://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
+#          attr="Sources: National Geographic, Esri, Garmin, HERE, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, INCREMENT P"
+#      )
+#      folium.Marker([LAT, LONG], popup=popup2, icon=folium.Icon(color=color, icon='fire', prefix='fa')).add_to(m)
+#      return m
+#      gc.collect()
 
-  # Function to display the legend
-  @st.cache_data(ttl=1200)
-  def display_legend():
-      st.info('Cliquer sur le point localisé sur la carte pour afficher les probabilités de chaque classe', icon="ℹ️")
-      st.markdown("")
-      st.markdown("Légende :")
-      col1, col2 = st.columns([0.15, 0.85], gap="small", vertical_alignment="center")
-      with col1:
-          st.image("feu_bleu.jpg", width=40)
-      with col2:
-          st.markdown(":blue[Probabilité classe 1 < 50%]")
-      col1, col2 = st.columns([0.15, 0.85], gap="small", vertical_alignment="center")
-      with col1:
-          st.image("feu_rouge.jpg", width=40)
-      with col2:
-          st.markdown(":red[Probabilité classe 1 > 50%]")
-      gc.collect()
+#  # Function to display the legend
+#  @st.cache_data(ttl=1200)
+#  def display_legend():
+#     st.info('Cliquer sur le point localisé sur la carte pour afficher les probabilités de chaque classe', icon="ℹ️")
+#      st.markdown("")
+#      st.markdown("Légende :")
+#      col1, col2 = st.columns([0.15, 0.85], gap="small", vertical_alignment="center")
+#      with col1:
+#          st.image("feu_bleu.jpg", width=40)
+#      with col2:
+#          st.markdown(":blue[Probabilité classe 1 < 50%]")
+#      col1, col2 = st.columns([0.15, 0.85], gap="small", vertical_alignment="center")
+#      with col1:
+#          st.image("feu_rouge.jpg", width=40)
+#      with col2:
+#          st.markdown(":red[Probabilité classe 1 > 50%]")
+#      gc.collect()
 
 # Main code
 #st.subheader("Prédiction de la classe de feux selon les paramètres choisis", divider="blue")
 
-  if st.checkbox("Afficher la prédiction de la classe de feux"):
-      col1, col2 = st.columns([0.55, 0.45], gap="small", vertical_alignment="center")
+#  if st.checkbox("Afficher la prédiction de la classe de feux"):
+#      col1, col2 = st.columns([0.55, 0.45], gap="small", vertical_alignment="center")
 
-      with col1:
-          with st.container(height=350):
-              m = generate_map(Fires_class_pred, prediction, df_prediction_proba, LAT, LONG)
-              st_data = st_folium(m, width=800, returned_objects=[], key="map")
-              gc.collect()
+#      with col1:
+#          with st.container(height=350):
+#              m = generate_map(Fires_class_pred, prediction, df_prediction_proba, LAT, LONG)
+#              st_data = st_folium(m, width=800, returned_objects=[], key="map")
+#              gc.collect()
 
-      with col2:
-          display_legend()
-          gc.collect() 
+#      with col2:
+#          display_legend()
+#          gc.collect() 
  
 # Conclusion
 if page == pages[5] : 

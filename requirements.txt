@@ -5,7 +5,7 @@ plotly==5.24.1
 scikit-learn
 seaborn
 streamlit==1.40.0
-xgboost==2.1.0
+xgboost
 folium
-streamlit-folium
+streamlit-folium*
 requests
