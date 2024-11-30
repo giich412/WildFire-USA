@@ -158,10 +158,13 @@ st.markdown(
 
 
 #Chargement dataframe sous alias df
-@st.cache_data(ttl=3600)
+@st.cache_resource
 def load_data():
   data=pd.read_csv('Firesclean.csv', index_col=0)
-  return data
+  # Scale down to 10 percent of the dataset
+  data_sampled = data.sample(frac=0.1, random_state=42)
+  return data_sampled
+  #return data
 df=load_data()
 
 st.sidebar.title("Sommaire")
@@ -1291,7 +1294,7 @@ pd.set_option('future.no_silent_downcasting', True)
 # Modèles de prédiction des classes
 if page == pages[4] :  
 
- @st.cache_data(ttl=1200)
+ @st.cache_resource
  def load_FiresML2():
   FiresML2= df.loc[:,['MONTH_DISCOVERY','FIRE_SIZE_CLASS','STAT_CAUSE_DESCR','AVG_TEMP [°C]','AVG_PCP [mm]','LONGITUDE','LATITUDE']]   #'AVG_TEMP [°C]','AVG_PCP [mm]'
   FiresML2['FIRE_SIZE_CLASS'] = FiresML2['FIRE_SIZE_CLASS'].replace({"A":0,"B":0,"C":0,"D":1,"E":1,"F":1,"G":1})
@@ -1328,12 +1331,12 @@ if page == pages[4] :
  @st.cache_data(ttl=1200)
  def label_circ(X_train, X_test):
    circular_cols = ['MONTH_DISCOVERY']
-   circular_train = X_train[circular_cols]
-   circular_test = X_test[circular_cols]
-   circular_train.loc['MONTH_DISCOVERY'] = circular_train['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h / 12))
-   circular_train.loc['MONTH_DISCOVERY'] = circular_train['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
-   circular_test.loc['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h /12))
-   circular_test.loc['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
+   circular_train = X_train[circular_cols].copy()
+   circular_test = X_test[circular_cols].copy()
+   circular_train['MONTH_DISCOVERY'] = circular_train['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h / 12))
+   circular_train['MONTH_DISCOVERY'] = circular_train['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
+   circular_test['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h /12))
+   circular_test['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
    return circular_train,circular_test
  circular_train,circular_test=label_circ(X_train,X_test)
  gc.collect()
@@ -1398,15 +1401,18 @@ if page == pages[4] :
   cat_input_fires=input_fires.drop(['AVG_TEMP [°C]','AVG_PCP [mm]','MONTH_DISCOVERY','LONGITUDE','LATITUDE'],axis=1)
   cat_input_fires=oneh.transform(cat_input_fires)
   circular_cols = ['MONTH_DISCOVERY']
-  circular_input_fires = input_fires[circular_cols]
-  circular_input_fires.loc['MONTH_DISCOVERY'] = circular_input_fires.loc['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h / 12))
-  circular_input_fires.loc['MONTH_DISCOVERY'] = circular_input_fires.loc['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
+  circular_input_fires = input_fires[circular_cols].copy()
+  circular_input_fires['MONTH_DISCOVERY'] = circular_input_fires['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h / 12))
+  circular_input_fires['MONTH_DISCOVERY'] = circular_input_fires['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
   df_fires_encoded=np.concatenate((num_input_fires,cat_input_fires,circular_input_fires),axis=1)
+  
+  #LAT = input_df.iloc[0]['LATITUDE']
+  #LONG = input_df.iloc[0]['LONGITUDE']
   LAT=input_df[:1].LATITUDE.to_numpy()
   LONG=input_df[:1].LONGITUDE.to_numpy()
   gc.collect()
- #classifier=st.selectbox("Sélection du modèle",("BalancedRandomForest","XGBoost"))
- #with st.form(key='my_form'):
+  #classifier=st.selectbox("Sélection du modèle",("BalancedRandomForest","XGBoost"))
+  #with st.form(key='my_form'):
   #submit_button = st.form_submit_button(label='Submit')
 
  if classifier == "XGBoost":       
