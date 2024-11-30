@@ -758,7 +758,7 @@ if page == pages[3] :
     feats = pd.get_dummies(feats, dtype = "int")
     return feats, target
   feats, target = data_labeling(Fires_ML)
-  gc.collect()
+  #gc.collect()
 
   # Séparation du jeu en train et test
   @st.cache_data(ttl=1200)
@@ -768,7 +768,7 @@ if page == pages[3] :
     # display(feats.shape, X_train.shape, X_test.shape)
     return X_train, X_test, y_train, y_test
   X_train, X_test, y_train, y_test = data_split(feats, target)
-  gc.collect()
+  #gc.collect()
 
 
   # Traitement des variables cycliques
@@ -790,7 +790,7 @@ if page == pages[3] :
     # circular_cols = circular_data.columns
     return circular_data
   circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
-  gc.collect()
+  #gc.collect()
 
   # Traitement des variables numériques
   @st.cache_data(ttl=1200)
@@ -815,7 +815,7 @@ if page == pages[3] :
     return X_num
 
   num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
-  gc.collect()
+  #gc.collect()
 
   # Reconstitution du jeu de données après traitement
   @st.cache_data(ttl=1200)
@@ -829,7 +829,7 @@ if page == pages[3] :
     overall_col = X_train_final.columns
     return X_train_final, X_test_final, overall_col
   X_train_final, X_test_final, overall_col = X_concat(num_train_imputed, num_test_imputed, circular_train, circular_test)
-  gc.collect()
+  #gc.collect()
 
 #  @st.cache_resource
 #  def model_reduction(classifier, X_train, y_train):
@@ -898,7 +898,7 @@ if page == pages[3] :
                                     index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
        feat_imp = list(feat_imp_data.index[-11:])
     return feat_imp
-  gc.collect() 
+    #gc.collect() 
 
   ######################################################################################################################################################################
   ### Fonctions de visualisation des métriques et graphes ##############################################################################################################
@@ -933,7 +933,7 @@ if page == pages[3] :
         legend_title='Classes'
     )
     return fig 
-  gc.collect()
+    #gc.collect()
   ######################################################################################################################################################################
   ### Fonctions d'entrainement sur l'ensemble du jeu d'entrainement et de sauvegarde des meilleurs modèles #############################################################
   ######################################################################################################################################################################  
@@ -951,7 +951,7 @@ if page == pages[3] :
       joblib.dump(clf_xgb, "best_xgb_raw_model.joblib")
       model = joblib.load("best_xgb_raw_model.joblib")
       return model
-  gc.collect()
+      #gc.collect()
 
   # Best xgb raw model
   #@st.cache_resource
