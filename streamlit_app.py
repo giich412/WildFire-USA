@@ -1288,7 +1288,7 @@ if page == pages[3] :
 
 # Modèles de prédiction des classes
 if page == pages[4] :  
-
+ pd.set_option('future.no_silent_downcasting', True)
  @st.cache_data(ttl=1200)
  def load_FiresML2():
   FiresML2= df.loc[:,['MONTH_DISCOVERY','FIRE_SIZE_CLASS','STAT_CAUSE_DESCR','AVG_TEMP [°C]','AVG_PCP [mm]','LONGITUDE','LATITUDE']]   #'AVG_TEMP [°C]','AVG_PCP [mm]'
@@ -1328,10 +1328,10 @@ if page == pages[4] :
    circular_cols = ['MONTH_DISCOVERY']
    circular_train = X_train[circular_cols]
    circular_test = X_test[circular_cols]
-   circular_train['MONTH_DISCOVERY'] = circular_train['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h / 12))
-   circular_train['MONTH_DISCOVERY'] = circular_train['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
-   circular_test['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h /12))
-   circular_test['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
+   circular_train.loc['MONTH_DISCOVERY'] = circular_train['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h / 12))
+   circular_train.loc['MONTH_DISCOVERY'] = circular_train['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
+   circular_test.loc['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h /12))
+   circular_test.loc['MONTH_DISCOVERY'] = circular_test['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
    return circular_train,circular_test
  circular_train,circular_test=label_circ(X_train,X_test)
  gc.collect()
@@ -1397,8 +1397,8 @@ if page == pages[4] :
   cat_input_fires=oneh.transform(cat_input_fires)
   circular_cols = ['MONTH_DISCOVERY']
   circular_input_fires = input_fires[circular_cols]
-  circular_input_fires['MONTH_DISCOVERY'] = circular_input_fires['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h / 12))
-  circular_input_fires['MONTH_DISCOVERY'] = circular_input_fires['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
+  circular_input_fires.loc['MONTH_DISCOVERY'] = circular_input_fires.loc['MONTH_DISCOVERY'].apply(lambda h : np.sin(2 * np.pi * h / 12))
+  circular_input_fires.loc['MONTH_DISCOVERY'] = circular_input_fires.loc['MONTH_DISCOVERY'].apply(lambda h : np.cos(2 * np.pi * h / 12))
   df_fires_encoded=np.concatenate((num_input_fires,cat_input_fires,circular_input_fires),axis=1)
   LAT=input_df[:1].LATITUDE.to_numpy()
   LONG=input_df[:1].LONGITUDE.to_numpy()
