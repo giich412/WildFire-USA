@@ -1,9 +1,11 @@
-imblearn
+imbalanced-learn
 numpy==2.0
 pandas
 plotly==5.24.1
 scikit-learn
 seaborn
-streamlit==1.40.1
-xgboost
+streamlit==1.40.0
+xgboost==2.1.0
+folium
+streamlit-folium
 requests
