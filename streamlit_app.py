@@ -762,12 +762,12 @@ if page == pages[3] :
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
     circular_data = X[circular_cols_init]
     # Encodage des variables temporelles cycliques
-    circular_data["SIN_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.sin(2*np.pi*m/12))
-    circular_data["COS_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.cos(2*np.pi*m/12))
-    circular_data["SIN_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.sin(2*np.pi*w/53))
-    circular_data["COS_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.cos(2*np.pi*w/53))
-    circular_data["SIN_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2*np.pi*d/7))
-    circular_data["COS_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2*np.pi*d/7))
+    circular_data.loc["SIN_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.sin(2*np.pi*m/12))
+    circular_data.loc["COS_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.cos(2*np.pi*m/12))
+    circular_data.loc["SIN_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.sin(2*np.pi*w/53))
+    circular_data.loc["COS_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.cos(2*np.pi*w/53))
+    circular_data.loc["SIN_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2*np.pi*d/7))
+    circular_data.loc["COS_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2*np.pi*d/7))
     # Suppression des variables cycliques sources pour éviter le doublon d'informations
     circular_data = circular_data.drop(circular_cols_init, axis = 1).reset_index(drop = True)
     # Récupération des noms de colonnes des nouvelles variables
@@ -793,8 +793,8 @@ if page == pages[3] :
     num_data = sub_num_data
     for fire_class in CLASS:
         num_imputed = numeric_imputer.fit_transform(sub_num_data[sub_num_data[fire_class] == 1])
-        num_data[num_data[fire_class] == 1] = num_imputed
-    X_num["DURATION"] = num_data["DURATION"]
+        num_data.loc[num_data[fire_class] == 1] = num_imputed
+    X_num.loc["DURATION"] = num_data["DURATION"]
     X_num = X_num.reset_index(drop = True)
     return X_num
   gc.collect()
