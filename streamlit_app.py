@@ -1286,9 +1286,11 @@ if page == pages[3] :
       st.dataframe(y_pred)
       #gc.collect()
 
+pd.set_option('future.no_silent_downcasting', True)
+
 # Modèles de prédiction des classes
 if page == pages[4] :  
- pd.set_option('future.no_silent_downcasting', True)
+
  @st.cache_data(ttl=1200)
  def load_FiresML2():
   FiresML2= df.loc[:,['MONTH_DISCOVERY','FIRE_SIZE_CLASS','STAT_CAUSE_DESCR','AVG_TEMP [°C]','AVG_PCP [mm]','LONGITUDE','LATITUDE']]   #'AVG_TEMP [°C]','AVG_PCP [mm]'
