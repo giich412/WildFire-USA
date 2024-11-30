@@ -16,7 +16,6 @@ Environnements techniques : SQL, Python (Pandas, scikit-learn, Matplotlib, Plotl
 ## 🔥 Streamlit App - Prédiction des feux de forêt aux USA 
 Cette application vise à prédire la cause des feux de forêt ainsi que la probabilité qu'un feu atteigne une taille critique.
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://wildfire-usa.streamlit.app/)
 <a href="https://wildfire-usa.streamlit.app/">
     <img src="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" width="200">
 </a>
