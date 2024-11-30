@@ -168,7 +168,7 @@ def load_data():
 df=load_data()
 
 st.sidebar.title("Sommaire")
-pages=["Contexte et présentation", "Preprocessing", "DataVizualization", "Prédiction des causes de feux", "Prédiction des classes de feux", "Conclusion"]
+pages=["Contexte et présentation", "Preprocessing", "DataVizualization", "Prédiction des classes de feux", "Prédiction des causes de feux", "Conclusion"]
 page=st.sidebar.radio("Aller vers", pages)
 
 # Création contenu de la première page (page 0) avec le contexte et présentation du projet
@@ -643,7 +643,7 @@ elif page == pages[2] :
         st.write("En analysant ces données plus en détail, on peut mieux comprendre les facteurs qui contribuent aux feux. Ces données soulignent l’importance de la prévention des feux de foret d’origine humaine et de la gestion des risques naturels pour minimiser les dégâts causés par les feux de forêt.")
   
 # Modèles de prédiction des causes
-if page == pages[3] : 
+if page == pages[4] : 
   st.write("## Prédiction des causes de feux")
 
   # Suppression des variables non utiles au ML
@@ -745,7 +745,7 @@ if page == pages[3] :
     feats = pd.get_dummies(feats, dtype = "int")
     return feats, target
   feats, target = data_labeling(Fires_ML)
-  #gc.collect()
+  gc.collect()
 
   # Séparation du jeu en train et test
   #@st.cache_data(ttl=1200)
@@ -809,7 +809,7 @@ if page == pages[3] :
   X_train_final, X_test_final, overall_col = X_concat(num_train_imputed, num_test_imputed, circular_train, circular_test)
 
   # Réduction du modèle avec la méthode feature importances
-  #@st.cache_resource
+  @st.cache_resource
   def model_reduction(classifier, X_train, y_train):
     if classifier == "XGBoost":
         clf = XGBClassifier(tree_method="approx", objective="multi:softprob").fit(X_train, y_train)
@@ -887,19 +887,19 @@ if page == pages[3] :
       return model
       #gc.collect()
 
-  # Best xgb raw model
-  #@st.cache_resource
-  #def best_rf_raw_model(X, y):
-  #   rf_best_params = {"n_estimators": 50,
-  #                    "max_depth": 100,
-  #                    "min_samples_leaf": 40,
-  #                    "min_samples_split": 50,
-  #                    "max_features": 'sqrt'}
-  #   clf_rf = RandomForestClassifier(**rf_best_params).fit(X, y)
-  #   joblib.dump(clf_rf, "best_rf_raw_model.joblib")
-  #   model = joblib.load("best_rf_raw_model.joblib")
-  #   return model
-  #   gc.collect()
+  # Best rf raw model
+  @st.cache_resource
+  def best_rf_raw_model(X, y):
+     rf_best_params = {"n_estimators": 50,
+                      "max_depth": 100,
+                      "min_samples_leaf": 40,
+                      "min_samples_split": 50,
+                      "max_features": 'sqrt'}
+     clf_rf = RandomForestClassifier(**rf_best_params).fit(X, y)
+     joblib.dump(clf_rf, "best_rf_raw_model.joblib")
+     model = joblib.load("best_rf_raw_model.joblib")
+     return model
+     gc.collect()
 
   # Best LogReg raw model
   @st.cache_resource
@@ -1006,21 +1006,21 @@ if page == pages[3] :
     ####################################
     ###     Modèle Random Forest     ###
     ####################################
-#elif classifier == "Random Forest":
-#      class_weights_option = st.sidebar.radio("Voulez-vous rééquilibrer les classes ?", ["Oui", "Non"], horizontal=True)
-#      if class_weights_option == "Oui":
-#          class_weights_array = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
-#          classes_weights = {i: weight for i, weight in enumerate(class_weights_array)}
-#          st.write("Les classes sont ré-équilibrées")
-#      else:
-#          classes_weights = None
-#          st.write("Les classes ne sont pas ré-équilibrées.")
-#      n_estimators = st.sidebar.slider("Veuillez choisir le nombre d'estimateurs", 5, 30, 10, 5)
-#      max_depth = st.sidebar.slider("Veuillez choisir la profondeur de l'arbre", 3, 10)
-#      min_samples_leaf = st.sidebar.slider("Veuillez choisir min_samples_leaf", 20, 60, 40, 5)
-#      min_samples_split = st.sidebar.slider("Veuillez choisir min_samples_split", 30, 100, 100, 5)      
-#      max_features = st.sidebar.radio("Veuillez choisir le nombre de features", ("sqrt", "log2"), horizontal=True)
-#      gc.collect()
+    elif classifier == "Random Forest":
+      class_weights_option = st.sidebar.radio("Voulez-vous rééquilibrer les classes ?", ["Oui", "Non"], horizontal=True)
+      if class_weights_option == "Oui":
+          class_weights_array = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
+          classes_weights = {i: weight for i, weight in enumerate(class_weights_array)}
+          st.write("Les classes sont ré-équilibrées")
+      else:
+          classes_weights = None
+          st.write("Les classes ne sont pas ré-équilibrées.")
+      n_estimators = st.sidebar.slider("Veuillez choisir le nombre d'estimateurs", 5, 30, 10, 5)
+      max_depth = st.sidebar.slider("Veuillez choisir la profondeur de l'arbre", 3, 10)
+      min_samples_leaf = st.sidebar.slider("Veuillez choisir min_samples_leaf", 20, 60, 40, 5)
+      min_samples_split = st.sidebar.slider("Veuillez choisir min_samples_split", 30, 100, 100, 5)      
+      max_features = st.sidebar.radio("Veuillez choisir le nombre de features", ("sqrt", "log2"), horizontal=True)
+      gc.collect()
     ####################################
     ### Modèle Regression Logistique ###
     ####################################
@@ -1049,6 +1049,7 @@ if page == pages[3] :
       min_samples_leaf = st.sidebar.slider("Veuillez choisir la profondeur de l'arbre", 10, 100, 50, 5)
       gc.collect()
 
+
     # Création d'un bouton pour le modèle avec les meilleurs paramètres
     if st.sidebar.button("Best Model Execution"):
       if classifier == "XGBoost":
@@ -1068,20 +1069,20 @@ if page == pages[3] :
         model = joblib.load("clf_xgb_best_model.joblib")
         gc.collect()
 
-      #elif classifier == "Random Forest":
-      #  st.subheader("Random Forest Result")
-      #  best_params = {"n_estimators": 50,
-      #                "max_depth": 100,
-      #                "min_samples_leaf": 40,
-      #                "min_samples_split": 50,
-      #                "max_features": 'sqrt'}
-      #  feat_imp = model_reduction(classifier, X_train_final, y_train)
-      #  X_train_final, X_test_final = X_train_final[feat_imp], X_test_final[feat_imp]
-      #  clf_rf_best = RandomForestClassifier(**best_params, class_weight='balanced').fit(X_train_final, y_train)
-      #  joblib.dump(clf_rf_best, "clf_rf_best_model.joblib")
+      elif classifier == "Random Forest":
+        st.subheader("Random Forest Result")
+        best_params = {"n_estimators": 50,
+                      "max_depth": 100,
+                      "min_samples_leaf": 40,
+                      "min_samples_split": 50,
+                      "max_features": 'sqrt'}
+        feat_imp = model_reduction(classifier, X_train_final, y_train)
+        X_train_final, X_test_final = X_train_final[feat_imp], X_test_final[feat_imp]
+        clf_rf_best = RandomForestClassifier(**best_params, class_weight='balanced').fit(X_train_final, y_train)
+        joblib.dump(clf_rf_best, "clf_rf_best_model.joblib")
         # Chargement du meilleur modèle
-      #  model = joblib.load("clf_rf_best_model.joblib")
-      #  gc.collect()
+        model = joblib.load("clf_rf_best_model.joblib")
+        gc.collect()
 
       elif classifier == "Regression Logistique":
         st.subheader("Logistic Regression Result")
@@ -1282,7 +1283,7 @@ if page == pages[3] :
   #pd.set_option('future.no_silent_downcasting', True)
 
 # Modèles de prédiction des classes
-if page == pages[4] :  
+if page == pages[3] :  
 
  @st.cache_resource
  def load_FiresML2():
