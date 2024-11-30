@@ -1,4 +1,4 @@
-# 🔥 Projet Analyse prédictive des feux de forêt aux USA
+# 🔥 Analyse prédictive des feux de forêt aux USA
 
 Dans le cadre de notre formation en analyse de données, nous avons réalisé un projet visant à analyser les données sur les feux de forêt aux États-Unis afin de comprendre les motifs et les tendances. Le jeu de données comprend des informations sur l’emplacement, la cause et l’impact des feux de forêt sur plusieurs années. En appliquant les compétences acquises durant notre formation, nous cherchons à prédire les occurrences futures de feux, leurs causes, leur taille et à identifier les zones à haut risque. En plus de contribuer à la préservation de l’environnement et à la sécurité publique, ce projet vise à améliorer la précision des prédictions et à fournir des informations détaillées pour guider les interventions. L’objectif est de renforcer les stratégies de prévention des feux de forêt, d’optimiser les ressources de lutte contre les incendies et de minimiser les impacts environnementaux et économiques à long terme.
 
