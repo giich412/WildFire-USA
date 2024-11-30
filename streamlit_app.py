@@ -805,7 +805,7 @@ if page == pages[3] :
     # circular_cols = circular_data.columns
     return circular_data_train, circular_data_test
   circular_train, circular_test = cyclic_transform(X_train, X_test)#, cyclic_transform(X_test)
-  gc.collect()
+  #gc.collect()
     
   # Traitement des variables numériques
   @st.cache_data(ttl=1200)
@@ -827,6 +827,30 @@ if page == pages[3] :
       return X_train_num_imputed, X_test_num_imputed
 
   num_train_imputed, num_test_imputed = num_imputer(X_train, X_test)
+
+  # Traitement des variables numériques
+  @st.cache_data(ttl=1200)
+  def num_imputer(X):
+      # Define the columns to be imputed
+      num_cols = X.columns
+    
+      # Instanciation de la méthode SimpleImputer
+      numeric_imputer = SimpleImputer(strategy="median")
+    
+      # Initialisation des variables
+      CLASS = ["FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", "FIRE_SIZE_CLASS_E", 
+             "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
+    
+      num_data = X.copy()
+    
+      for fire_class in CLASS:
+          num_imputed = numeric_imputer.fit_transform(num_data[num_data[fire_class] == 1])
+          num_data.loc[num_data[fire_class] == 1] = num_imputed
+    
+      return num_data
+
+  num_train_imputed = num_imputer(X_train)
+  num_test_imputed = num_imputer(X_test)
 
 #  # Traitement des variables numériques
 #  @st.cache_data(ttl=1200)
