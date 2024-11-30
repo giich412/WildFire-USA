@@ -259,41 +259,41 @@ elif page == pages[2] :
     
     if subpage == subpages[0]:
         st.subheader("1 - Analyse des outliers et de la répartitions des valeurs numériques")
-        col1, col2 = st.columns([0.55, 0.45], gap="small", vertical_alignment="center")
-        with col1:
-          @st.cache_data(ttl=1200)
-          def plot_box():
-            fig, axes = plt.subplots(2, 3, figsize=(12, 7))
-            sns.set(rc={"axes.facecolor": "#333341", "figure.facecolor": "#333341"}) #F4E4AA
-            sns.set_theme(style='dark')
-            sns.boxplot(ax=axes[0, 0], x=df['DURATION'])
-            sns.boxplot(ax=axes[0, 1], x=df['FIRE_SIZE'])
-            sns.boxplot(ax=axes[0, 2], x=df['AVG_PCP [mm]'])
-            sns.boxplot(ax=axes[1, 0], x=df['LATITUDE'])
-            sns.boxplot(ax=axes[1, 1], x=df['LONGITUDE'])
-            sns.boxplot(ax=axes[1, 2], x=df['AVG_TEMP [°C]'])
-            return fig
-          fig = plot_box()
-          st.pyplot(fig)
+        #col1, col2 = st.columns([0.55, 0.45], gap="small", vertical_alignment="center")
+        #with col1:
+        #  @st.cache_data(ttl=1200)
+        #  def plot_box():
+        #    fig, axes = plt.subplots(2, 3, figsize=(12, 7))
+        #    sns.set(rc={"axes.facecolor": "#333341", "figure.facecolor": "#333341"}) #F4E4AA
+        #    sns.set_theme(style='dark')
+        #    sns.boxplot(ax=axes[0, 0], x=df['DURATION'])
+        #    sns.boxplot(ax=axes[0, 1], x=df['FIRE_SIZE'])
+        #    sns.boxplot(ax=axes[0, 2], x=df['AVG_PCP [mm]'])
+        #    sns.boxplot(ax=axes[1, 0], x=df['LATITUDE'])
+        #    sns.boxplot(ax=axes[1, 1], x=df['LONGITUDE'])
+        #    sns.boxplot(ax=axes[1, 2], x=df['AVG_TEMP [°C]'])
+        #    return fig
+        #  fig = plot_box()
+        #  st.pyplot(fig)
 
         #st.subheader("1 - Analyse des outliers et de la répartitions des valeurs numériques")
-        #col1, col2 =st.columns([0.55, 0.45],gap="small",vertical_alignment="center")
-        #with col1 :
-        #  @st.cache_data(ttl=1200)
-        #  def plot_violin():
-        #    fig, axes = plt.subplots(2, 3,figsize=(12,7))
-        #    #sns.set_style(style='white')
-        #    sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
-        #    sns.set_theme()
-        #    sns.violinplot(ax=axes[0, 0], x=df['DURATION'])
-        #    sns.violinplot(ax=axes[0, 1],x=df['FIRE_SIZE'])
-        #    sns.violinplot(ax=axes[0, 2],x=df['AVG_PCP [mm]'])
-        #    sns.violinplot(ax=axes[1,0],x=df['LATITUDE'])
-        #    sns.violinplot(ax=axes[1, 1],x=df['LONGITUDE'])
-        #    sns.violinplot(ax=axes[1, 2],x=df['AVG_TEMP [°C]'])
-        #    return fig
-        #  fig=plot_violin()
-        #  fig 
+        col1, col2 =st.columns([0.55, 0.45],gap="small",vertical_alignment="center")
+        with col1 :
+          @st.cache_data(ttl=1200)
+          def plot_violin():
+            fig, axes = plt.subplots(2, 3,figsize=(12,7))
+            sns.set_style(style='dark')
+            sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
+            sns.set_theme()
+            sns.violinplot(ax=axes[0, 0], x=df['DURATION'])
+            sns.violinplot(ax=axes[0, 1],x=df['FIRE_SIZE'])
+            sns.violinplot(ax=axes[0, 2],x=df['AVG_PCP [mm]'])
+            sns.violinplot(ax=axes[1,0],x=df['LATITUDE'])
+            sns.violinplot(ax=axes[1, 1],x=df['LONGITUDE'])
+            sns.violinplot(ax=axes[1, 2],x=df['AVG_TEMP [°C]'])
+            return fig
+          fig=plot_violin()
+          fig 
 
         with col2 :
           st.markdown("Certaines variables comme les tailles de feux et les durées présentent des valeurs particulièrement extrêmes.")  
