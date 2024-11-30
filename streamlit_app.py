@@ -671,19 +671,6 @@ if page == pages[3] :
   Fires_ML = Fires_ML.iloc[:-200, :]
   #gc.collect()
 
-  # Check shapes and indices
-  print("Fires_ML shape after preprocessing:", Fires_ML.shape)
-  print("Fires_test2 shape:", Fires_test2.shape)
-  print("Fires_ML indices:", Fires_ML.index)
-  print("Fires_test2 indices:", Fires_test2.index)
-
-  # Verify no NaN values
-  assert not Fires_ML.isnull().values.any(), "Fires_ML contains NaN values"
-  assert not Fires_test2.isnull().values.any(), "Fires_test2 contains NaN values"
-
-  gc.collect()
-
-
   st.subheader("Regroupement des causes 🗂️", divider="blue") 
   if st.checkbox("Cliquez pour voir les causes de feux"):
     col1, col2= st.columns(spec = 2, gap = "large")
@@ -761,7 +748,7 @@ if page == pages[3] :
   #gc.collect()
 
   # Séparation du jeu en train et test
-  @st.cache_data(ttl=1200)
+  #@st.cache_data(ttl=1200)
   def data_split(X, y):
     # Data split of features and target
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, shuffle = False)
@@ -770,218 +757,82 @@ if page == pages[3] :
   X_train, X_test, y_train, y_test = data_split(feats, target)
   #gc.collect()
 
-
-  # Traitement des variables cycliques
-  @st.cache_data(ttl=1200)
-  def cyclic_transform(X_train, X_test):
+  def cyclic_transform(X):
     # Séparation des variables suivant leur type
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
-    
-    # Fit on training data
-    circular_data_train = X_train[circular_cols_init].copy()
-    ##circular_data = X[circular_cols_init].copy()
+    circular_data = X[circular_cols_init].copy()
     # Encodage des variables temporelles cycliques
-    circular_data_train["SIN_MONTH"] = circular_data_train["MONTH_DISCOVERY"].apply(lambda m: np.sin(2*np.pi*m/12))     #.loc
-    circular_data_train["COS_MONTH"] = circular_data_train["MONTH_DISCOVERY"].apply(lambda m: np.cos(2*np.pi*m/12))
-    circular_data_train["SIN_WEEK"] = circular_data_train["DISCOVERY_WEEK"].apply(lambda w: np.sin(2*np.pi*w/53))
-    circular_data_train["COS_WEEK"] = circular_data_train["DISCOVERY_WEEK"].apply(lambda w: np.cos(2*np.pi*w/53))
-    circular_data_train["SIN_DAY"] = circular_data_train["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2*np.pi*d/7))
-    circular_data_train["COS_DAY"] = circular_data_train["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2*np.pi*d/7))
+    circular_data["SIN_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.sin(2 * np.pi * m / 12))
+    circular_data["COS_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.cos(2 * np.pi * m / 12))
+    circular_data["SIN_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.sin(2 * np.pi * w / 53))
+    circular_data["COS_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.cos(2 * np.pi * w / 53))
+    circular_data["SIN_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2 * np.pi * d / 7))
+    circular_data["COS_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2 * np.pi * d / 7))
     # Suppression des variables cycliques sources pour éviter le doublon d'informations
-    circular_data_train = circular_data_train.drop(circular_cols_init, axis = 1).reset_index(drop = True)
-    # Fit on training data
-    circular_data_test = X_test[circular_cols_init].copy()
-    ##circular_data = X[circular_cols_init].copy()
-    # Encodage des variables temporelles cycliques
-    circular_data_test["SIN_MONTH"] = circular_data_test["MONTH_DISCOVERY"].apply(lambda m: np.sin(2*np.pi*m/12))     #.loc
-    circular_data_test["COS_MONTH"] = circular_data_test["MONTH_DISCOVERY"].apply(lambda m: np.cos(2*np.pi*m/12))
-    circular_data_test["SIN_WEEK"] = circular_data_test["DISCOVERY_WEEK"].apply(lambda w: np.sin(2*np.pi*w/53))
-    circular_data_test["COS_WEEK"] = circular_data_test["DISCOVERY_WEEK"].apply(lambda w: np.cos(2*np.pi*w/53))
-    circular_data_test["SIN_DAY"] = circular_data_test["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2*np.pi*d/7))
-    circular_data_test["COS_DAY"] = circular_data_test["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2*np.pi*d/7))
-    # Suppression des variables cycliques sources pour éviter le doublon d'informations
-    circular_data_train = circular_data_train.drop(circular_cols_init, axis = 1).reset_index(drop = True)
-    # Récupération des noms de colonnes des nouvelles variables
-    # circular_cols = circular_data.columns
-    return circular_data_train, circular_data_test
-  circular_train, circular_test = cyclic_transform(X_train, X_test)#, cyclic_transform(X_test)
-  #gc.collect()
-    
-  # Traitement des variables numériques
-  @st.cache_data(ttl=1200)
-  def num_imputer(X_train, X_test):
-      circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
-      num_cols = X_train.drop(circular_cols_init, axis=1).columns
-    
-      # Fit on training data
-      X_train_num = X_train[num_cols].copy()
-      numeric_imputer = SimpleImputer(strategy="median")
-      X_train_num_imputed = numeric_imputer.fit_transform(X_train_num)
-      X_train_num_imputed = pd.DataFrame(X_train_num_imputed, columns=num_cols)
-    
-      # Apply to test data
-      X_test_num = X_test[num_cols].copy()
-      X_test_num_imputed = numeric_imputer.transform(X_test_num)
-      X_test_num_imputed = pd.DataFrame(X_test_num_imputed, columns=num_cols)
-    
-      return X_train_num_imputed, X_test_num_imputed
+    circular_data = circular_data.drop(circular_cols_init, axis=1).reset_index(drop=True)
+    return circular_data
 
-  num_train_imputed, num_test_imputed = num_imputer(X_train, X_test)
+  circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
 
   # Traitement des variables numériques
-  @st.cache_data(ttl=1200)
   def num_imputer(X):
-      # Define the columns to be imputed
-      num_cols = X.columns
-    
-      # Instanciation de la méthode SimpleImputer
-      numeric_imputer = SimpleImputer(strategy="median")
-    
-      # Initialisation des variables
-      CLASS = ["FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", "FIRE_SIZE_CLASS_E", 
+    circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
+    num_cols = X.drop(circular_cols_init, axis=1).columns
+    X_num = X[num_cols].copy()
+    # Instanciation de la méthode SimpleImputer
+    numeric_imputer = SimpleImputer(strategy="median")
+    # Initialisation des variables
+    CLASS = ["FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", "FIRE_SIZE_CLASS_E",
              "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
-    
-      num_data = X.copy()
-    
-      for fire_class in CLASS:
-          num_imputed = numeric_imputer.fit_transform(num_data[num_data[fire_class] == 1])
-          num_data.loc[num_data[fire_class] == 1] = num_imputed
-    
-      return num_data
+    sub_col = ["DURATION", "FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D",
+               "FIRE_SIZE_CLASS_E", "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
+    sub_num_data = X_num[sub_col].copy()
+    num_data = sub_num_data.copy()
+    for fire_class in CLASS:
+        num_imputed = numeric_imputer.fit_transform(sub_num_data[sub_num_data[fire_class] == 1])
+        num_data.loc[num_data[fire_class] == 1, sub_col] = num_imputed
+    X_num["DURATION"] = num_data["DURATION"]
+    X_num = X_num.reset_index(drop=True)
+    return X_num
 
-  num_train_imputed = num_imputer(X_train)
-  num_test_imputed = num_imputer(X_test)
+  num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
 
-#  # Traitement des variables numériques
-#  @st.cache_data(ttl=1200)
-#  def num_imputer(X):
-#    circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
-#    num_cols = feats.drop(circular_cols_init, axis = 1).columns
-#    X_num = X[num_cols].copy()
-#    # Instanciation de la méthode SimpleImputer
-#    numeric_imputer = SimpleImputer(strategy = "median")
-#    # Initialisation des variables
-#    CLASS = ["FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", "FIRE_SIZE_CLASS_E", 
-#             "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
-#    sub_col = ["DURATION","FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", 
-#               "FIRE_SIZE_CLASS_E", "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
-#    sub_num_data = X_num[sub_col].copy()
-#    num_data = sub_num_data.copy()
-#    for fire_class in CLASS:
-#        num_imputed = numeric_imputer.fit_transform(sub_num_data[sub_num_data[fire_class] == 1])
-#        num_data[num_data[fire_class] == 1] = num_imputed  #.loc
-#    X_num["DURATION"] = num_data["DURATION"] #.loc
-#    X_num = X_num.reset_index(drop = True)
-#    return X_num
-
-#  num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
-#  #gc.collect()
-  
   # Reconstitution du jeu de données après traitement
-  @st.cache_data(ttl=1200)
   def X_concat(X_train_num, X_test_num, circular_train, circular_test):
-      X_train_final = pd.concat([X_train_num, circular_train], axis=1)
-      X_test_final = pd.concat([X_test_num, circular_test], axis=1)
-    
-      X_train_final = X_train_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
-      X_test_final = X_test_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
-    
-      overall_col = X_train_final.columns
-    
-      return X_train_final, X_test_final, overall_col
+    X_train_final = pd.concat([X_train_num, circular_train], axis=1)
+    X_test_final = pd.concat([X_test_num, circular_test], axis=1)
+    X_train_final = X_train_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
+    X_test_final = X_test_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
+    overall_col = X_train_final.columns
+    return X_train_final, X_test_final, overall_col
 
   X_train_final, X_test_final, overall_col = X_concat(num_train_imputed, num_test_imputed, circular_train, circular_test)
 
-  # Verify no NaN values in the datasets
-  assert not X_train_final.isnull().values.any(), "X_train_final contains NaN values"
-  assert not y_train.isnull().values.any(), "y_train contains NaN values"
-
-  print("No NaN values found in the datasets.")
-
-  gc.collect()
-
-  # Reconstitution du jeu de données après traitement
-#  @st.cache_data(ttl=1200)
-#  def X_concat(X_train_num, X_test_num, circular_train, circular_test):
-#    X_train_final = pd.concat([X_train_num, circular_train], axis = 1)
-#    X_test_final = pd.concat([X_test_num, circular_test], axis = 1)
-#    X_train_final = X_train_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
-#    X_test_final = X_test_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
-#    X_total = pd.concat([X_train_final, X_test_final], axis = 0)
-#   y_total = pd.concat([y_train, y_test], axis = 0)
-#    overall_col = X_train_final.columns
-#    return X_train_final, X_test_final, overall_col
-#  X_train_final, X_test_final, overall_col = X_concat(num_train_imputed, num_test_imputed, circular_train, circular_test)
-#  #gc.collect()
-
-#  @st.cache_resource
-#  def model_reduction(classifier, X_train, y_train):
-#    # Check Data Shapes
-#    print("X_train shape:", X_train.shape)
-#    print("y_train shape:", y_train.shape)
-    
-    # Verify Data Integrity
-#    assert not X_train.isnull().values.any(), "X_train contains NaN values"
-#    assert not y_train.isnull().values.any(), "y_train contains NaN values"
-    
-    # Align Indices
-#    X_train = X_train.reset_index(drop=True)
-#    y_train = y_train.reset_index(drop=True)
-    
-#    if classifier == "XGBoost":
-#        clf = XGBClassifier(tree_method="approx", objective="multi:softprob").fit(X_train.head(1000), y_train.head(1000))
-#        feat_imp_data = pd.DataFrame(list(clf.get_booster().get_fscore().items()),
-#                                     columns=["feature", "importance"]).sort_values('importance', ascending=True)
-#        fea#t_imp = list(feat_imp_data["feature"][-11:])
-#    elif classifier == "Regression Logistique":
-#        clf = LogisticRegression(random_state=42, max_iter=1000).fit(X_train, y_train)
-#        coefficients = clf.coef_
-#        avg_importance = np.mean(np.abs(coefficients), axis=0)
-#        feat_imp_data = pd.DataFrame({"feature": X_train.columns, "importance": avg_importance}).sort_values('importance', ascending=True)
-#        feat_imp = list(feat_imp_data["feature"][-11:])
-#    elif classifier == "Arbre de Décision":
-#        clf = DecisionTreeClassifier(criterion="gini", random_state=42).fit(X_train, y_train)
-#        feat_imp_data = pd.DataFrame(clf.feature_importances_,
-#                                     index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
-#        feat_imp = list(feat_imp_data.index[-11:])
-    
-#    return feat_imp
-
-#gc.collect()
-
-# Example usage (assuming X_train_final and y_train are defined)
-# feat_imp = model_reduction("XGBoost", X_train_final, y_train)
-
-
-
-
   # Réduction du modèle avec la méthode feature importances
-  @st.cache_resource
+  #@st.cache_resource
   def model_reduction(classifier, X_train, y_train):
     if classifier == "XGBoost":
-       clf = XGBClassifier(tree_method = "approx",
-                           objective = "multi:softprob").fit(X_train, y_train)
-       feat_imp_data = pd.DataFrame(list(clf.get_booster().get_fscore().items()),
-                                    columns=["feature", "importance"]).sort_values('importance', ascending=True)
-       feat_imp = list(feat_imp_data["feature"][-11:])
-    #elif classifier == "Random Forest":
-    #   clf = RandomForestClassifier().fit(X_train, y_train)
-    #   feat_imp_data = pd.DataFrame(clf.feature_importances_,
-    #                                index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
-    #   feat_imp = list(feat_imp_data.index[-11:])
+        clf = XGBClassifier(tree_method="approx", objective="multi:softprob").fit(X_train, y_train)
+        feat_imp_data = pd.DataFrame(list(clf.get_booster().get_fscore().items()),
+                                     columns=["feature", "importance"]).sort_values('importance', ascending=True)
+        feat_imp = list(feat_imp_data["feature"][-11:])
+    elif classifier == "Random Forest":
+        clf = RandomForestClassifier().fit(X_train, y_train)
+        feat_imp_data = pd.DataFrame(clf.feature_importances_,
+                                     index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
+        feat_imp = list(feat_imp_data.index[-11:])
     elif classifier == "Regression Logistique":
-       clf = LogisticRegression(random_state = 42, max_iter=1000).fit(X_train, y_train)
-       coefficients = clf.coef_
-       avg_importance = np.mean(np.abs(coefficients), axis = 0)
-       feat_imp_data = pd.DataFrame({"feature":X_train.columns, "importance":avg_importance}).sort_values('importance', ascending=True)
-       feat_imp = list(feat_imp_data["feature"][-11:])
+        clf = LogisticRegression(random_state=42, max_iter=1000).fit(X_train, y_train)
+        coefficients = clf.coef_
+        avg_importance = np.mean(np.abs(coefficients), axis=0)
+        feat_imp_data = pd.DataFrame({"feature": X_train.columns, "importance": avg_importance}).sort_values('importance', ascending=True)
+        feat_imp = list(feat_imp_data["feature"][-11:])
     elif classifier == "Arbre de Décision":
-       clf = DecisionTreeClassifier(criterion = "gini", random_state = 42).fit(X_train, y_train)
-       feat_imp_data = pd.DataFrame(clf.feature_importances_,
-                                    index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
-       feat_imp = list(feat_imp_data.index[-11:])
+        clf = DecisionTreeClassifier(criterion="gini", random_state=42).fit(X_train, y_train)
+        feat_imp_data = pd.DataFrame(clf.feature_importances_,
+                                     index=X_train.columns, columns=["importance"]).sort_values('importance', ascending=True)
+        feat_imp = list(feat_imp_data.index[-11:])
     return feat_imp
-    #gc.collect() 
 
   ######################################################################################################################################################################
   ### Fonctions de visualisation des métriques et graphes ##############################################################################################################
