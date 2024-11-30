@@ -283,7 +283,7 @@ elif page == pages[2] :
           def plot_violin():
             fig, axes = plt.subplots(2, 3,figsize=(12,7))
             sns.set_style(style='dark')
-            sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
+            #sns.set(rc={"axes.facecolor": "#F4E4AA", "figure.facecolor": "#F4E4AA"})
             sns.set_theme()
             sns.violinplot(ax=axes[0, 0], x=df['DURATION'])
             sns.violinplot(ax=axes[0, 1],x=df['FIRE_SIZE'])
