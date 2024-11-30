@@ -773,63 +773,122 @@ if page == pages[3] :
 
   # Traitement des variables cycliques
   @st.cache_data(ttl=1200)
-  def cyclic_transform(X):
+  def cyclic_transform(X_train, X_test):
     # Séparation des variables suivant leur type
     circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
-    circular_data = X[circular_cols_init].copy()
+    
+    # Fit on training data
+    circular_data_train = X_train[circular_cols_init].copy()
+    ##circular_data = X[circular_cols_init].copy()
     # Encodage des variables temporelles cycliques
-    circular_data["SIN_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.sin(2*np.pi*m/12))     #.loc
-    circular_data["COS_MONTH"] = circular_data["MONTH_DISCOVERY"].apply(lambda m: np.cos(2*np.pi*m/12))
-    circular_data["SIN_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.sin(2*np.pi*w/53))
-    circular_data["COS_WEEK"] = circular_data["DISCOVERY_WEEK"].apply(lambda w: np.cos(2*np.pi*w/53))
-    circular_data["SIN_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2*np.pi*d/7))
-    circular_data["COS_DAY"] = circular_data["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2*np.pi*d/7))
+    circular_data_train["SIN_MONTH"] = circular_data_train["MONTH_DISCOVERY"].apply(lambda m: np.sin(2*np.pi*m/12))     #.loc
+    circular_data_train["COS_MONTH"] = circular_data_train["MONTH_DISCOVERY"].apply(lambda m: np.cos(2*np.pi*m/12))
+    circular_data_train["SIN_WEEK"] = circular_data_train["DISCOVERY_WEEK"].apply(lambda w: np.sin(2*np.pi*w/53))
+    circular_data_train["COS_WEEK"] = circular_data_train["DISCOVERY_WEEK"].apply(lambda w: np.cos(2*np.pi*w/53))
+    circular_data_train["SIN_DAY"] = circular_data_train["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2*np.pi*d/7))
+    circular_data_train["COS_DAY"] = circular_data_train["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2*np.pi*d/7))
     # Suppression des variables cycliques sources pour éviter le doublon d'informations
-    circular_data = circular_data.drop(circular_cols_init, axis = 1).reset_index(drop = True)
+    circular_data_train = circular_data_train.drop(circular_cols_init, axis = 1).reset_index(drop = True)
+    # Fit on training data
+    circular_data_test = X_test[circular_cols_init].copy()
+    ##circular_data = X[circular_cols_init].copy()
+    # Encodage des variables temporelles cycliques
+    circular_data_test["SIN_MONTH"] = circular_data_test["MONTH_DISCOVERY"].apply(lambda m: np.sin(2*np.pi*m/12))     #.loc
+    circular_data_test["COS_MONTH"] = circular_data_test["MONTH_DISCOVERY"].apply(lambda m: np.cos(2*np.pi*m/12))
+    circular_data_test["SIN_WEEK"] = circular_data_test["DISCOVERY_WEEK"].apply(lambda w: np.sin(2*np.pi*w/53))
+    circular_data_test["COS_WEEK"] = circular_data_test["DISCOVERY_WEEK"].apply(lambda w: np.cos(2*np.pi*w/53))
+    circular_data_test["SIN_DAY"] = circular_data_test["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.sin(2*np.pi*d/7))
+    circular_data_test["COS_DAY"] = circular_data_test["DAY_OF_WEEK_DISCOVERY"].apply(lambda d: np.cos(2*np.pi*d/7))
+    # Suppression des variables cycliques sources pour éviter le doublon d'informations
+    circular_data_train = circular_data_train.drop(circular_cols_init, axis = 1).reset_index(drop = True)
     # Récupération des noms de colonnes des nouvelles variables
     # circular_cols = circular_data.columns
-    return circular_data
-  circular_train, circular_test = cyclic_transform(X_train), cyclic_transform(X_test)
-  #gc.collect()
-
+    return circular_data_train, circular_data_test
+  circular_train, circular_test = cyclic_transform(X_train, X_test)#, cyclic_transform(X_test)
+  gc.collect()
+    
   # Traitement des variables numériques
   @st.cache_data(ttl=1200)
-  def num_imputer(X):
-    circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
-    num_cols = feats.drop(circular_cols_init, axis = 1).columns
-    X_num = X[num_cols].copy()
-    # Instanciation de la méthode SimpleImputer
-    numeric_imputer = SimpleImputer(strategy = "median")
-    # Initialisation des variables
-    CLASS = ["FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", "FIRE_SIZE_CLASS_E", 
-             "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
-    sub_col = ["DURATION","FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", 
-               "FIRE_SIZE_CLASS_E", "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
-    sub_num_data = X_num[sub_col].copy()
-    num_data = sub_num_data.copy()
-    for fire_class in CLASS:
-        num_imputed = numeric_imputer.fit_transform(sub_num_data[sub_num_data[fire_class] == 1])
-        num_data[num_data[fire_class] == 1] = num_imputed  #.loc
-    X_num["DURATION"] = num_data["DURATION"] #.loc
-    X_num = X_num.reset_index(drop = True)
-    return X_num
+  def num_imputer(X_train, X_test):
+      circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
+      num_cols = X_train.drop(circular_cols_init, axis=1).columns
+    
+      # Fit on training data
+      X_train_num = X_train[num_cols].copy()
+      numeric_imputer = SimpleImputer(strategy="median")
+      X_train_num_imputed = numeric_imputer.fit_transform(X_train_num)
+      X_train_num_imputed = pd.DataFrame(X_train_num_imputed, columns=num_cols)
+    
+      # Apply to test data
+      X_test_num = X_test[num_cols].copy()
+      X_test_num_imputed = numeric_imputer.transform(X_test_num)
+      X_test_num_imputed = pd.DataFrame(X_test_num_imputed, columns=num_cols)
+    
+      return X_train_num_imputed, X_test_num_imputed
 
-  num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
-  #gc.collect()
+  num_train_imputed, num_test_imputed = num_imputer(X_train, X_test)
 
+#  # Traitement des variables numériques
+#  @st.cache_data(ttl=1200)
+#  def num_imputer(X):
+#    circular_cols_init = ["MONTH_DISCOVERY", "DISCOVERY_WEEK", "DAY_OF_WEEK_DISCOVERY"]
+#    num_cols = feats.drop(circular_cols_init, axis = 1).columns
+#    X_num = X[num_cols].copy()
+#    # Instanciation de la méthode SimpleImputer
+#    numeric_imputer = SimpleImputer(strategy = "median")
+#    # Initialisation des variables
+#    CLASS = ["FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", "FIRE_SIZE_CLASS_E", 
+#             "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
+#    sub_col = ["DURATION","FIRE_SIZE_CLASS_A", "FIRE_SIZE_CLASS_B", "FIRE_SIZE_CLASS_C", "FIRE_SIZE_CLASS_D", 
+#               "FIRE_SIZE_CLASS_E", "FIRE_SIZE_CLASS_F", "FIRE_SIZE_CLASS_G"]
+#    sub_num_data = X_num[sub_col].copy()
+#    num_data = sub_num_data.copy()
+#    for fire_class in CLASS:
+#        num_imputed = numeric_imputer.fit_transform(sub_num_data[sub_num_data[fire_class] == 1])
+#        num_data[num_data[fire_class] == 1] = num_imputed  #.loc
+#    X_num["DURATION"] = num_data["DURATION"] #.loc
+#    X_num = X_num.reset_index(drop = True)
+#    return X_num
+
+#  num_train_imputed, num_test_imputed = num_imputer(X_train), num_imputer(X_test)
+#  #gc.collect()
+  
   # Reconstitution du jeu de données après traitement
   @st.cache_data(ttl=1200)
   def X_concat(X_train_num, X_test_num, circular_train, circular_test):
-    X_train_final = pd.concat([X_train_num, circular_train], axis = 1)
-    X_test_final = pd.concat([X_test_num, circular_test], axis = 1)
-    X_train_final = X_train_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
-    X_test_final = X_test_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
-    X_total = pd.concat([X_train_final, X_test_final], axis = 0)
-    y_total = pd.concat([y_train, y_test], axis = 0)
-    overall_col = X_train_final.columns
-    return X_train_final, X_test_final, overall_col
+      X_train_final = pd.concat([X_train_num, circular_train], axis=1)
+      X_test_final = pd.concat([X_test_num, circular_test], axis=1)
+    
+      X_train_final = X_train_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
+      X_test_final = X_test_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
+    
+      overall_col = X_train_final.columns
+    
+      return X_train_final, X_test_final, overall_col
+
   X_train_final, X_test_final, overall_col = X_concat(num_train_imputed, num_test_imputed, circular_train, circular_test)
-  #gc.collect()
+
+  # Verify no NaN values in the datasets
+  assert not X_train_final.isnull().values.any(), "X_train_final contains NaN values"
+  assert not y_train.isnull().values.any(), "y_train contains NaN values"
+
+  print("No NaN values found in the datasets.")
+
+  gc.collect()
+
+  # Reconstitution du jeu de données après traitement
+#  @st.cache_data(ttl=1200)
+#  def X_concat(X_train_num, X_test_num, circular_train, circular_test):
+#    X_train_final = pd.concat([X_train_num, circular_train], axis = 1)
+#    X_test_final = pd.concat([X_test_num, circular_test], axis = 1)
+#    X_train_final = X_train_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
+#    X_test_final = X_test_final.rename(columns={"AVG_TEMP [°C]": "AVG_TEMP", "AVG_PCP [mm]": "AVG_PCP"})
+#    X_total = pd.concat([X_train_final, X_test_final], axis = 0)
+#   y_total = pd.concat([y_train, y_test], axis = 0)
+#    overall_col = X_train_final.columns
+#    return X_train_final, X_test_final, overall_col
+#  X_train_final, X_test_final, overall_col = X_concat(num_train_imputed, num_test_imputed, circular_train, circular_test)
+#  #gc.collect()
 
 #  @st.cache_resource
 #  def model_reduction(classifier, X_train, y_train):
@@ -876,7 +935,7 @@ if page == pages[3] :
   @st.cache_resource
   def model_reduction(classifier, X_train, y_train):
     if classifier == "XGBoost":
-       clf = XGBClassifier(tree_meethod = "approx",
+       clf = XGBClassifier(tree_method = "approx",
                            objective = "multi:softprob").fit(X_train, y_train)
        feat_imp_data = pd.DataFrame(list(clf.get_booster().get_fscore().items()),
                                     columns=["feature", "importance"]).sort_values('importance', ascending=True)
@@ -1353,7 +1412,8 @@ if page == pages[4] :
  @st.cache_resource
  def load_FiresML2():
   FiresML2= df.loc[:,['MONTH_DISCOVERY','FIRE_SIZE_CLASS','STAT_CAUSE_DESCR','AVG_TEMP [°C]','AVG_PCP [mm]','LONGITUDE','LATITUDE']]   #'AVG_TEMP [°C]','AVG_PCP [mm]'
-  FiresML2['FIRE_SIZE_CLASS'] = FiresML2['FIRE_SIZE_CLASS'].replace({"A":0,"B":0,"C":0,"D":1,"E":1,"F":1,"G":1})
+  FiresML2['FIRE_SIZE_CLASS'] = FiresML2['FIRE_SIZE_CLASS'].replace({"A": 0, "B": 0, "C": 0, "D": 1, "E": 1, "F": 1, "G": 1}).infer_objects(copy=False)
+  #FiresML2['FIRE_SIZE_CLASS'] = FiresML2['FIRE_SIZE_CLASS'].replace({"A":0,"B":0,"C":0,"D":1,"E":1,"F":1,"G":1})
   FiresML2=FiresML2.dropna() 
   return FiresML2
  gc.collect()
@@ -1516,7 +1576,7 @@ if page == pages[4] :
       return figML1
      figML1=cm()
      figML1 
-  if st.checkbox("AAffichage Features Importance"):
+  if st.checkbox("Affichage Features Importance"):
     with col1 : 
      with st.container(height=350):
       feats1 = {}
